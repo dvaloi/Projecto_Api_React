@@ -1,0 +1,4000 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal INSS — M15 e M16</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600;700&family=Source+Sans+3:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+    :root {
+      --green: #006233; --green-dark: #004d28; --green-soft: #e6f4ec;
+      --gold: #c9a227; --gold-soft: #fff8e1; --red: #ce1126; --red-soft: #fde8ea;
+      --blue: #0b3d91; --border: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 22px; }
+    body {
+      font-family: "Source Sans 3", "Segoe UI", Calibri, sans-serif;
+      background: #fff; color: #111; overflow: hidden; height: 100vh; max-height: 100vh; font-weight: 700;
+      letter-spacing: .01em; text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    .flag-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 10px; z-index: 200;
+      background: linear-gradient(90deg,#006233 0 25%,#111 25% 50%,#fcd116 50% 75%,#ce1126 75% 100%);
+    }
+    .progress {
+      position: fixed; top: 10px; left: 0; height: 6px;
+      background: var(--red); z-index: 100; transition: width .25s;
+    }
+    .slide {
+      display: none; height: 100vh; padding: 0.5rem 1.5rem 5rem;
+      flex-direction: column; animation: fadeIn .2s ease;
+      overflow: hidden;
+    }
+    .slide.compact {
+      overflow: hidden;
+      padding-bottom: 5.5rem;
+      box-sizing: border-box;
+    }
+    .slide.active { display: flex; }
+    .slide.fill { justify-content: center; text-align: center; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    h1 {
+      font-size: 2.9rem; font-weight: 800; color: var(--green);
+      line-height: 1.08; margin-bottom: .45rem; letter-spacing: -.03em;
+    }
+    h2 {
+      font-size: 2rem; color: var(--green); font-weight: 800;
+      border-bottom: 4px solid var(--gold); padding-bottom: .2rem; margin-bottom: .45rem;
+      letter-spacing: -.02em; flex-shrink: 0;
+    }
+    p, li { font-size: 1.32rem; line-height: 1.3; font-weight: 700; margin-bottom: .22rem; }
+    ul, ol { padding-left: 1.5rem; }
+    strong { font-weight: 900; }
+    code {
+      font-family: "IBM Plex Mono", Consolas, monospace; background: #111; color: #e8f5ee;
+      padding: .08rem .35rem; border-radius: 5px; font-size: .92em; font-weight: 700;
+      white-space: normal; overflow-wrap: anywhere; word-break: break-word;
+    }
+    .highlight { color: var(--red); font-size: 2rem; font-weight: 800; margin-bottom: .5rem; }
+    .content {
+      flex: 1 1 auto; display: flex; flex-direction: column;
+      justify-content: flex-start; gap: 0.45rem; min-height: 0; min-width: 0;
+      width: 100%; overflow: hidden;
+    }
+    .fluxo {
+      display: flex; flex-wrap: wrap; align-items: stretch;
+      justify-content: center; gap: 0.65rem; margin: .1rem 0;
+      flex-shrink: 0;
+    }
+    .fluxo .passo {
+      flex: 1 1 7.5rem; background: var(--green-soft); border: 3px solid var(--green);
+      border-radius: 10px; padding: .55rem .65rem; text-align: center;
+      font-size: 1.1rem; font-weight: 700; line-height: 1.25;
+    }
+    .fluxo .passo small { display: block; font-weight: 700; font-size: .88em; margin-top: .15rem; }
+    .fluxo .seta {
+      align-self: center; color: var(--red); font-weight: 900;
+      font-size: 1.8rem;
+    }
+    .callout {
+      background: var(--gold-soft); border: 3px solid var(--gold); border-left: 10px solid var(--gold);
+      border-radius: 12px; padding: .85rem 1.15rem;
+      font-size: 1.5rem; font-weight: 700; line-height: 1.3;
+    }
+    .fill .callout { max-width: 46rem; margin: 1rem auto; text-align: left; }
+    .callout.green { background: var(--green-soft); border-color: var(--green); border-left-color: var(--green); }
+    .callout.red { background: var(--red-soft); border-color: var(--red); border-left-color: var(--red); }
+    .tag {
+      display: inline-block; background: var(--blue); color: #fff; font-weight: 900;
+      padding: .25rem .65rem; border-radius: 8px; font-size: 1.25rem; margin-bottom: .25rem;
+    }
+    .tag.ok { background: var(--green); }
+    .tag.gold { background: var(--gold); color: #111; }
+    table { width: 100%; border-collapse: collapse; font-size: 1.3rem; }
+    th, td { border: 2px solid var(--border); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+    th { background: var(--green); color: #fff; }
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+      padding: .35rem 1.2rem; display: flex; justify-content: space-between; align-items: center;
+      border-top: 4px solid var(--green); z-index: 100;
+    }
+    .nav-bar button {
+      background: var(--green); color: #fff; border: none; padding: .4rem 1.1rem;
+      border-radius: 8px; cursor: pointer; font-size: 1.05rem; font-weight: 800; min-width: 120px;
+    }
+    .nav-bar button:disabled { opacity: .35; }
+    .slide-counter { font-size: 1.25rem; font-weight: 900; }
+    .hint {
+      position: fixed; top: .95rem; right: .95rem; font-size: 1rem; font-weight: 800; color: #444;
+      z-index: 150; background: #fff; border: 2px solid var(--border); border-radius: 8px; padding: .35rem .6rem;
+    }
+    .slide-mapa .lado h3 { color: var(--gold); }
+    .slide-mapa .linha-tempo .etapa .oq code { font-size: .9em; }
+    .slide-mapa .provavel {
+      font-size: 1.22rem; font-weight: 800; color: var(--green); margin-top: .35rem;
+    }
+    .slide-mapa .linha-tempo.fit { gap: .32rem; }
+    .slide-mapa .linha-tempo.fit .etapa { padding: .5rem .7rem; }
+    .slide-mapa .linha-tempo.fit .etapa .tit { font-size: 1.28rem; }
+    .slide-mapa .linha-tempo.fit .etapa .oq { font-size: 1.15rem; }
+    .slide-mapa .passo-limpo { margin-bottom: .35rem !important; }
+    .slide-mapa .arvore li { font-size: .9rem !important; }
+    .slide.divisor-pratica {
+      justify-content: center; text-align: center; background: var(--green-soft);
+      border-top: 8px solid var(--green); border-bottom: 8px solid var(--green);
+    }
+    .slide.divisor-pratica h1 { color: var(--green); margin-bottom: .35rem; }
+    .slide.divisor-pratica .highlight { font-size: 1.75rem; }
+    .slide.divisor-pratica .fluxo {
+      margin: .45rem auto .35rem; max-width: 100%; flex-wrap: wrap;
+      justify-content: center; gap: .4rem .35rem;
+    }
+    .slide.divisor-pratica .fluxo .passo { font-size: 1.05rem; padding: .45rem .5rem; flex: 0 1 auto; min-width: 8rem; }
+    .slide.divisor-pratica .fluxo .seta { font-size: 1.4rem; }
+    .slide.divisor-pratica .instr-cola { font-size: 1.45rem; margin-top: .35rem; }
+    .slide.divisor-pratica .aviso-cola { color: var(--red); font-size: 1.35rem; margin-top: .35rem; }
+    .tela {
+      border: 3px solid #3c3c3c; border-radius: 8px; overflow: hidden;
+      font-family: Consolas, "IBM Plex Mono", "Courier New", monospace;
+      flex: 0 1 auto; min-height: 0; max-height: 100%;
+      display: flex; flex-direction: column;
+      box-shadow: 0 0 0 1px #252526;
+    }
+    .tela-bar {
+      background: #2d2d30; color: #cccccc; padding: .35rem .7rem;
+      font-size: 1rem; font-weight: 700;
+      border-bottom: 1px solid #1e1e1e;
+      border-left: 3px solid #007acc;
+      flex-shrink: 0;
+    }
+    .tela.code .tela-bar { border-left-color: #22a06b; }
+    .tela-body {
+      background: #1e1e1e; color: #d4d4d4; padding: .55rem .8rem;
+      font-size: 1.05rem; line-height: 1.38; white-space: pre-wrap;
+      overflow-wrap: anywhere; flex: 1 1 auto; min-height: 0;
+      overflow: auto; font-weight: 500;
+    }
+    /* Cores do Visual Studio Dark / VS Code Dark+ */
+    .tela-body .k, .term .k { color: #569cd6; }   /* keyword: public, const, return, function */
+    .tela-body .t, .term .t, .tela-body .hi { color: #4ec9b0; } /* tipo / componente React */
+    .tela-body .s, .term .s { color: #ce9178; }   /* string */
+    .tela-body .c, .term .c { color: #6a9955; }   /* comentário */
+    .tela-body .a, .term .a { color: #9cdcfe; }   /* atributo / parâmetro / prop */
+    .tela-body .at, .term .at { color: #c586c0; } /* [HttpGet] / import / export */
+    .tela-body .m, .term .m { color: #dcdcaa; }   /* método / função */
+    .tela-body .n, .term .n { color: #b5cea8; }   /* número */
+    .tela-body .mark { background: #264f78; color: #fff; }
+    .tela-body.denso {
+      font-size: 1rem; line-height: 1.36; padding: .5rem .75rem;
+    }
+    .slide.compact .tela {
+      flex: 0 0 auto; max-height: none;
+    }
+    .slide.compact .tela-body {
+      overflow: visible; flex: 0 0 auto; max-height: none;
+    }
+    .slide.compact .split.codigo .col { gap: .35rem; justify-content: flex-start; overflow: visible; max-height: none; }
+    .slide.compact .split.codigo { align-items: start; }
+    .slide.compact .split.codigo .tela-body.denso { font-size: .88rem; line-height: 1.28; padding: .45rem .65rem; }
+    .slide.compact .split.codigo .tela-body.mini { font-size: .78rem; line-height: 1.22; padding: .4rem .55rem; }
+    .slide.compact .split.codigo .content { overflow: visible; justify-content: flex-start; }
+    .slide.compact .split.codigo .vs-path { margin-bottom: .15rem; }
+    .slide.compact .split.codigo .passo-limpo { font-size: 1.12rem !important; margin-bottom: .25rem !important; }
+    ol.colar { padding-left: 1.4rem; margin: .2rem 0 .35rem; }
+    ol.colar li { font-size: 1.22rem !important; margin-bottom: .25rem !important; }
+    .slide.compact .passo-limpo { font-size: 1.22rem !important; margin-bottom: .35rem !important; }
+    .guia-tag {
+      display: inline-block; font-size: .95rem; font-weight: 900; color: #fff;
+      background: var(--green); padding: .12rem .45rem; border-radius: 5px; margin-right: .35rem;
+    }
+    .guia-tag.prova { background: var(--blue); }
+    .guia-tag.erro { background: var(--red); }
+    .guia-tag.copiar { background: var(--red); }
+    .guia-tag.leitura { background: var(--gold); color: #111; }
+    .slide-badge {
+      display: inline-block; font-size: 1rem; font-weight: 900; padding: .2rem .55rem;
+      border-radius: 6px; margin-bottom: .35rem;
+    }
+    .slide-badge.copiar { background: var(--red-soft); color: var(--red); border: 2px solid var(--red); }
+    .slide-badge.leitura { background: var(--gold-soft); color: #5a4a00; border: 2px solid var(--gold); }
+    .slide-badge.executar { background: #eef3ff; color: var(--blue); border: 2px solid var(--blue); }
+    .slide-badge.pular { background: #f3f3f3; color: #555; border: 2px solid #888; }
+    .arvore.arquivo .bar::before { background: #007acc; }
+    .arvore.arquivo li.foco { background: #264f78; border-left: 3px solid #fcd116; }
+    .arvore li.ok { color: #4ec9b0 !important; font-weight: 800; }
+    .arvore li.fail { color: #f48771 !important; font-weight: 800; }
+    .arvore.testes .bar { border-left-color: #4ec9b0; }
+    .slide.compact.codigo-full { overflow: auto; padding-bottom: 4.5rem; }
+    .slide.compact.codigo-full .content,
+    .slide.compact.codigo-full .split,
+    .slide.compact.codigo-full .split .col { overflow: visible; max-height: none; }
+    .slide.compact.codigo-full .tela { overflow: visible; max-height: none; flex: 0 0 auto; }
+    .slide.compact.codigo-full .tela-body.mini { font-size: .76rem; line-height: 1.24; overflow: visible; padding: .4rem .55rem; }
+    .slide.compact.codigo-full h2 { font-size: 1.65rem; margin-bottom: .2rem; }
+    .slide.compact.codigo-full .slide-badge { font-size: .9rem; margin-bottom: .2rem; }
+    .slide.compact .onde { font-size: 1.15rem; margin-bottom: .35rem; }
+    .callout.cola { font-size: 1.28rem; padding: .65rem .9rem; line-height: 1.35; }
+    .legenda-vs {
+      display: flex; flex-wrap: wrap; gap: .35rem .7rem; margin-top: .35rem;
+      font-size: .85rem !important; font-weight: 700; font-family: Consolas, monospace;
+    }
+    .legenda-vs span { font-size: .85rem !important; }
+    .legenda-vs .k { color: #569cd6; }
+    .legenda-vs .t { color: #4ec9b0; }
+    .legenda-vs .s { color: #ce9178; }
+    .legenda-vs .c { color: #6a9955; }
+    .legenda-vs .at { color: #c586c0; }
+    .legenda-vs .m { color: #dcdcaa; }
+    pre.term {
+      background: #1e1e1e; color: #d4d4d4; padding: .65rem .85rem; border-radius: 8px;
+      border: 2px solid #3c3c3c; font-family: Consolas, "IBM Plex Mono", monospace;
+      font-size: 1.1rem; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere;
+      max-width: 100%; font-weight: 500; overflow: auto; flex: 0 1 auto;
+    }
+    .split.codigo {
+      grid-template-columns: minmax(0, 1.9fr) minmax(9.5rem, 0.65fr); gap: .85rem;
+    }
+    .arvore {
+      background: #252526; color: #cccccc; border: 1px solid #3c3c3c; border-radius: 6px;
+      padding: 0; font-family: "Segoe UI", Consolas, sans-serif;
+      font-size: 1.05rem; line-height: 1.4; font-weight: 600;
+      flex: 0 1 auto; min-height: 0; overflow: auto;
+    }
+    .arvore .bar {
+      background: #2d2d30; color: #cccccc; font-size: .92rem; font-weight: 700;
+      border-bottom: 1px solid #3c3c3c; padding: .4rem .7rem;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .arvore .bar::before {
+      content: ""; width: 10px; height: 10px; border-radius: 2px; background: #007acc;
+    }
+    .arvore.vscode .bar::before { background: #22a06b; }
+    .arvore ul { list-style: none; margin: 0; padding: .25rem 0 .35rem; }
+    .arvore li {
+      padding: .08rem .7rem .08rem 1rem; color: #cccccc;
+      font-size: .95rem !important; line-height: 1.25; margin-bottom: 0 !important;
+    }
+    .arvore li.indent { padding-left: 1.8rem; }
+    .arvore li.indent2 { padding-left: 2.6rem; }
+    .arvore .pasta::before { content: ""; }
+    .arvore .arq::before { content: ""; }
+    .arvore .cs::before { content: ""; }
+    .arvore .pasta { color: #dcb67a; }
+    .arvore .arq, .arvore .cs { color: #9cdcfe; }
+    .arvore .novo { color: #b5cea8; font-weight: 800; }
+    .arvore .foco {
+      background: #094771; border-left: 3px solid #007acc; padding-left: calc(1rem - 3px);
+    }
+    .arvore .foco.indent { padding-left: calc(1.8rem - 3px); }
+    .arvore .foco.indent2 { padding-left: calc(2.6rem - 3px); }
+    .arvore .hint { color: #858585; font-size: .88rem; font-weight: 600; margin-left: .35rem; }
+    .slide.compact .arvore { font-size: .92rem; }
+    .slide.compact .arvore li { font-size: .88rem !important; }
+    .slide.compact .arvore .bar { font-size: .85rem; padding: .32rem .55rem; }
+    .arvore-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+    @media (max-width: 1100px) { .arvore-dupla { grid-template-columns: 1fr; } }
+    .vs-path {
+      display: flex; flex-wrap: wrap; align-items: center; gap: .25rem;
+      margin-bottom: .35rem;
+    }
+    .vs-path .chip {
+      background: #2d2d30; color: #e0e0e0; border: 1px solid #3c3c3c;
+      border-radius: 4px; padding: .2rem .55rem; font-size: 1rem; font-weight: 700;
+      font-family: "Segoe UI", sans-serif;
+    }
+    .vs-path .sep { color: #858585; font-weight: 800; font-size: 1.1rem; }
+    .vs-path .chip.accent { background: #007acc; border-color: #007acc; color: #fff; }
+    .vs-path .chip.code { background: #22a06b; border-color: #22a06b; color: #fff; }
+    .nuget {
+      background: #1e1e1e; border: 1px solid #3c3c3c; border-radius: 6px; overflow: hidden;
+    }
+    .nuget .nb {
+      background: #2d2d30; color: #ccc; padding: .4rem .7rem; font-size: .95rem; font-weight: 700;
+      border-bottom: 1px solid #3c3c3c;
+    }
+    .nuget .nb span { color: #007acc; margin-right: .5rem; }
+    .nuget .row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .55rem .75rem; border-bottom: 1px solid #2d2d30;
+      font-family: Consolas, monospace; font-size: 1.05rem; color: #9cdcfe; font-weight: 700;
+    }
+    .nuget .row:last-child { border-bottom: none; }
+    .nuget .btn {
+      background: #0e639c; color: #fff; border-radius: 3px; padding: .2rem .55rem;
+      font-size: .9rem; font-weight: 800; font-family: "Segoe UI", sans-serif;
+    }
+    .term-bar {
+      background: #2d2d30; color: #ccc; padding: .3rem .65rem; font-size: .9rem; font-weight: 700;
+      border-radius: 6px 6px 0 0; border: 1px solid #3c3c3c; border-bottom: none;
+      font-family: "Segoe UI", sans-serif;
+    }
+    pre.term.vs {
+      border-radius: 0 0 6px 6px; margin-top: 0; border-color: #3c3c3c;
+    }
+    .passo-limpo {
+      font-size: 1.4rem !important; margin-bottom: .5rem !important; font-weight: 700;
+    }
+    /* compact = menos itens por slide; letra GRANDE para projetor */
+    .slide.compact p, .slide.compact li { font-size: 1.28rem; margin-bottom: .2rem; line-height: 1.32; }
+    .slide.compact h2 { font-size: 1.85rem; margin-bottom: .3rem; }
+    .slide.compact ol, .slide.compact ul { margin-bottom: 0; }
+    /* center-y + overflow cortava o topo — alinhar no topo e rolar se precisar */
+    .slide.compact .content.center-y { justify-content: flex-start; }
+    .linha-tempo { display: flex; flex-direction: column; gap: .35rem; }
+    .linha-tempo .etapa {
+      display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: .65rem;
+      align-items: start; background: var(--green-soft); border: 2px solid var(--green);
+      border-radius: 10px; padding: .45rem .65rem;
+    }
+    .linha-tempo .etapa .num {
+      font-size: 1.1rem; font-weight: 900; color: var(--green); line-height: 1.2;
+    }
+    .linha-tempo .etapa .tit { font-size: 1.38rem; font-weight: 900; margin-bottom: .12rem; }
+    .linha-tempo .etapa .oq { font-size: 1.22rem; font-weight: 700; color: #333; line-height: 1.3; }
+    .linha-tempo .etapa .prova { font-size: 1.15rem; font-weight: 800; color: var(--red); margin-top: .15rem; }
+    table.def th { width: 26%; }
+    table.def td:last-child { font-weight: 700; }
+    .slide.compact table.def,
+    .slide.compact table.def th,
+    .slide.compact table.def td,
+    .slide.compact table:not(.def),
+    .slide.compact table:not(.def) th,
+    .slide.compact table:not(.def) td {
+      font-size: 1.45rem; line-height: 1.35;
+    }
+    .slide.compact table.def th,
+    .slide.compact table.def td,
+    .slide.compact table:not(.def) th,
+    .slide.compact table:not(.def) td { padding: .55rem .75rem; }
+    .linha-tempo.fit { gap: .45rem; }
+    .linha-tempo.fit .etapa {
+      grid-template-columns: 4.5rem minmax(0, 1fr); padding: .65rem .85rem; gap: .7rem;
+    }
+    .linha-tempo.fit .etapa .num { font-size: 1.3rem; }
+    .linha-tempo.fit .etapa .tit { font-size: 1.38rem; margin: 0; }
+    .linha-tempo.fit .etapa .prova { font-size: 1.18rem; margin-top: .12rem; }
+    .slide.compact .callout { font-size: 1.18rem; padding: .5rem .75rem; line-height: 1.28; }
+    .slide.compact .card h3 { font-size: 1.22rem; margin-bottom: .08rem; }
+    .slide.compact .card p { font-size: 1.08rem; margin-bottom: .06rem; }
+    .slide.compact .card { padding: .5rem .7rem; }
+    .slide.compact .cards { gap: .45rem; }
+    .slide.compact .explica {
+      font-size: 1.15rem; padding: .4rem .65rem; line-height: 1.28; margin: 0;
+    }
+    .slide.compact ul.termo { margin: .12rem 0 .15rem; }
+    .slide.compact ul.termo li {
+      font-size: 1.1rem !important; margin-bottom: .12rem !important; padding-left: .45rem;
+    }
+    .slide.compact.teoria .split .col { gap: .15rem; }
+    .slide.compact.teoria .fluxo { gap: .35rem; margin: 0; }
+    .slide.compact.teoria .fluxo .passo { padding: .35rem .45rem; font-size: 1rem; }
+    .slide.compact.teoria .lado { padding: .75rem .85rem; gap: .35rem; }
+    .slide.compact.teoria .lado p { font-size: 1.05rem !important; margin-bottom: .2rem !important; }
+    .slide.compact .lado h3 { font-size: 1.55rem; }
+    .slide.compact .lado li,
+    .slide.compact .lado p { font-size: 1.32rem !important; }
+    .slide.compact .fluxo .passo { font-size: 1.28rem; padding: .65rem .75rem; }
+    .slide.mapa-final .split { align-items: stretch; }
+    .slide.mapa-final .passo-limpo { margin-bottom: .2rem !important; }
+    .split {
+      flex: 1; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(12rem, 0.9fr); gap: 1.2rem;
+      min-height: 0; min-width: 0; align-items: stretch; width: 100%;
+    }
+    .split .col {
+      display: flex; flex-direction: column; gap: 0.28rem;
+      min-height: 0; min-width: 0; overflow: hidden; max-height: 100%;
+    }
+    /* Conteúdo rola se não couber na tela — evita cortar terminal/callout */
+    .slide.compact .content {
+      flex: 1 1 auto; min-height: 0;
+      overflow-x: hidden; overflow-y: auto;
+      scrollbar-gutter: stable; padding-right: .2rem;
+    }
+    .slide.compact .split { flex: 1 1 auto; min-height: 0; align-items: start; }
+    .slide.compact .split .col { min-height: 0; overflow: visible; max-height: none; }
+    .slide.compact .lado { max-height: none; overflow: visible; }
+    .slide.compact.teoria .content { justify-content: center; }
+    .slide.compact.split.codigo .content,
+    .slide.compact .split.codigo .content { justify-content: flex-start; }
+    .slide.compact .lado { align-self: stretch; }
+    .slide.compact pre.term.vs { font-size: 1.05rem; padding: .55rem .75rem; line-height: 1.35; }
+    .slide.compact .nuget .row { padding: .4rem .65rem; font-size: .98rem; }
+    .split .col > p,
+    .split .col > ol,
+    .split .col > ul,
+    .split .col > .passo-limpo,
+    .split .col > .vs-path,
+    .split .col > .tag,
+    .split .col > .legenda-vs { flex-shrink: 0; }
+    .cards {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9rem; flex: 0 0 auto;
+      align-items: stretch;
+    }
+    .cards.dois { grid-template-columns: 1fr 1fr; }
+    .card {
+      background: #f3f6f4; border: 2px solid var(--border); border-left: 8px solid var(--green);
+      border-radius: 12px; padding: 0.85rem 1rem; display: flex; flex-direction: column;
+      justify-content: flex-start; min-width: 0; overflow-wrap: anywhere;
+    }
+    .card.azul { border-left-color: #007acc; }
+    .card.code { border-left-color: #22a06b; }
+    .card h3 {
+      color: var(--green); font-size: 1.35rem;
+      margin-bottom: .25rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.2;
+    }
+    .card p, .slide.compact .card p, .slide.compact .card li {
+      font-size: 1.15rem; margin-bottom: .15rem; font-weight: 700;
+      line-height: 1.3;
+    }
+    .lado {
+      background: #1f2a22; color: #f4f6f5; border-radius: 14px; padding: 1.15rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.55rem;
+      min-height: 0; min-width: 0; overflow-wrap: anywhere; align-self: stretch;
+    }
+    .lado h3 { color: #fcd116; font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; }
+    .lado ol, .lado ul { margin: 0; padding-left: 1.2rem; }
+    .lado li, .lado p {
+      color: #f4f6f5; font-size: 1.15rem !important;
+      margin-bottom: .35rem; font-weight: 700; line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+    .lado .rodape { margin-top: auto; font-size: 1.05rem !important; opacity: .95; font-weight: 700; }
+    /* Callout dentro do painel escuro: texto escuro (contraste legível) */
+    .lado .callout,
+    .lado .callout.green,
+    .lado .callout.red,
+    .lado .callout p,
+    .lado .callout strong {
+      color: #111 !important;
+    }
+    .lado .callout code {
+      color: #e8f5ee !important; /* code global já tem fundo #111 */
+    }
+    .lado .callout {
+      font-size: 1.05rem !important;
+      line-height: 1.35;
+      margin: .15rem 0;
+    }
+    .explica {
+      background: #eef3ff; border: 2px solid #9cb4e8; border-left: 8px solid var(--blue);
+      border-radius: 0 10px 10px 0; padding: .55rem .9rem;
+      font-size: 1.35rem; font-weight: 700; line-height: 1.35;
+    }
+    ul.termo { list-style: none; padding: 0; margin: .3rem 0 .4rem; }
+    ul.termo li {
+      font-size: 1.32rem !important; margin-bottom: .28rem !important; line-height: 1.35;
+      padding-left: .65rem; border-left: 4px solid var(--gold);
+    }
+    ul.termo li strong { color: var(--green); }
+    .browser {
+      border: 3px solid #3c3c3c; border-radius: 8px; overflow: hidden;
+      display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0;
+    }
+    .browser .barra {
+      background: #f1f3f4; border-bottom: 1px solid #d0d3d6; padding: .35rem .6rem;
+      display: flex; align-items: center; gap: .5rem;
+      font-family: "Segoe UI", sans-serif; font-size: .95rem; font-weight: 700; color: #333;
+    }
+    .browser .barra .url {
+      background: #fff; border: 1px solid #d0d3d6; border-radius: 99px;
+      padding: .15rem .7rem; flex: 1; font-family: Consolas, monospace; font-size: .9rem; color: #111;
+    }
+    .browser .barra .bolas { color: #9aa0a6; letter-spacing: .1rem; font-weight: 900; }
+    .browser .pagina {
+      background: #fff; padding: .7rem .9rem; font-family: "Segoe UI", sans-serif;
+      font-size: 1.05rem; color: #111; overflow: auto; min-height: 0;
+    }
+    .browser .pagina h4 { color: var(--green); font-size: 1.15rem; margin-bottom: .3rem; }
+    .browser .pagina .item {
+      border-bottom: 1px solid #e2e6e3; padding: .3rem 0; display: flex; justify-content: space-between;
+      font-size: 1rem; font-weight: 700;
+    }
+    .browser .pagina .aviso { color: var(--red); font-weight: 800; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="flag-bar"></div>
+  <div class="progress" id="progress" style="width:2%"></div>
+  <div class="hint">← → · PageUp/Down · F11</div>
+  <div class="deck">
+
+    <section class="slide fill active">
+      <h1>Testes e pipeline<br>sobre o portal INSS</h1>
+      <p class="highlight">Dia 4 — M15 + M16</p>
+      <p>Profº Fernando Lopes Cardoso Ferreira</p>
+      <p>17 de setembro de 2026 · G2 · INSS Moçambique</p>
+    </section>
+
+    <section class="slide compact">
+      <h2>De onde partimos — o app da Ana</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Hoje <strong>não</strong> criamos app novo — usamos o <strong>mesmo</strong> <code>InssApi</code> + <code>inss-portal</code> do Dia 3.</p>
+            <div class="cards dois">
+              <div class="card azul">
+                <h3>InssApi + JWT</h3>
+                <p>API protegida — token no Swagger e no portal</p>
+              </div>
+              <div class="card code">
+                <h3>Portal + login</h3>
+                <p>React — lista, ficha, pedidos da Ana</p>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Pasta</h3>
+            <p><code>D:\fiap_turma_2</code></p>
+            <p>Mesmos projetos de ontem</p>
+            <p class="rodape">Só acrescentamos coisas.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>De onde partimos — portas e login</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <div class="cards dois">
+              <div class="card">
+                <h3>5088 / 5173</h3>
+                <p>Portas fixas — API e Vite (não mudam hoje)</p>
+              </div>
+              <div class="card azul">
+                <h3>Login demo</h3>
+                <p><code>ana@inss.gov.mz</code> / <code>1234</code></p>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Chips</h3>
+            <p><strong>Azul</strong> → Visual Studio</p>
+            <p><strong>Verde</strong> → VS Code</p>
+            <p class="rodape">Mesmo usuário nos testes.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>O que fica em fiap_turma_2 — manhã (M15)</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo"><strong>Não copiem pasta nenhuma.</strong> Continuem na mesma raiz do Dia 3:</p>
+            <div class="arvore vscode">
+              <div class="bar">D:\fiap_turma_2</div>
+              <ul>
+                <li class="pasta">InssApi/</li>
+                <li class="indent cs">… projeto do Visual Studio (Dia 1–3)</li>
+                <li class="pasta">inss-portal/</li>
+                <li class="indent cs">… portal React (Dia 3)</li>
+                <li class="pasta novo foco">InssApi.Tests/</li>
+                <li class="indent cs novo">… xUnit — criamos hoje (Passo 1)</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Manhã</h3>
+            <p>2 projetos antigos</p>
+            <p>+ 1 projeto novo</p>
+            <p class="rodape">Mesma pasta de sempre.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>O que acrescentamos — tarde (M16)</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">À tarde, na <strong>mesma</strong> <code>fiap_turma_2</code>, evolução da pasta:</p>
+            <div class="arvore vscode">
+              <div class="bar">fiap_turma_2 · depois da tarde</div>
+              <ul>
+                <li class="pasta">InssApi/</li>
+                <li class="pasta">InssApi.Tests/</li>
+                <li class="pasta">inss-portal/</li>
+                <li class="cs novo">.gitignore</li>
+                <li class="pasta novo foco">.github/workflows/ci.yml</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Na sua pasta</h3>
+            <p>Manhã: VS Code = <code>inss-portal</code></p>
+            <p>Tarde: VS Code = <strong>raiz</strong> fiap_turma_2</p>
+            <p class="rodape">Mesmos 3 projetos + Git.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Linha do tempo (1/2) — manhã</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Mesmo projeto do Dia 3 — verde para avançar.</p>
+            <div class="linha-tempo fit">
+              <div class="etapa">
+                <div class="num">D3</div>
+                <div>
+                  <div class="tit">JWT + portal da Ana</div>
+                  <div class="prova">F5 + login OK</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">M15</div>
+                <div>
+                  <div class="tit">7 Facts .NET + 2 e2e</div>
+                  <div class="prova">dotnet test + test:e2e</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Manhã</h3>
+            <p>Prova local</p>
+            <p class="rodape">Depois: GitHub.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Linha do tempo (2/2) — tarde</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <div class="linha-tempo fit">
+              <div class="etapa">
+                <div class="num">M16</div>
+                <div>
+                  <div class="tit">Repo no GitHub</div>
+                  <div class="prova">3 pastas no site</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">M16</div>
+                <div>
+                  <div class="tit"><code>ci.yml</code> → Actions</div>
+                  <div class="prova">Pipeline verde</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Meta</h3>
+            <p>7 + 2 locais</p>
+            <p>1 repo + 1 workflow</p>
+            <p class="rodape">Não é app novo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>O dia inteiro — 3 momentos</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <div class="linha-tempo fit">
+              <div class="etapa"><div class="num">A</div><div><div class="tit">Teoria (manhã)</div><div class="prova">Título “Teoria —” · só olhem</div></div></div>
+              <div class="etapa"><div class="num">B</div><div><div class="tit">Prática (manhã)</div><div class="prova">Título “Passo N” · digitem</div></div></div>
+              <div class="etapa"><div class="num">C</div><div><div class="tit">Git + CI (tarde)</div><div class="prova">Tarde Passos 1–15</div></div></div>
+            </div>
+            <p class="passo-limpo">Os números <strong>1–5</strong> da teoria <em>não</em> são os Passos do teclado — confundir isso é o erro nº 1.</p>
+          </div>
+          <aside class="lado">
+            <h3>Regra</h3>
+            <p>“Passo” = digitem</p>
+            <p>“Teoria” = escutem</p>
+            <p class="rodape">Próximo: o que vocês vão vendo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide fill">
+      <p class="tag">Manhã</p>
+      <h1>M15 — Testes</h1>
+      <p class="highlight">Unitário · integração · e2e</p>
+    </section>
+
+    <section class="slide compact">
+      <h2>Por que automatizar?</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Teste automatizado = um programa que verifica outro programa.</p>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Regras que já temos</h3>
+                <p>NUIT com 9 dígitos</p>
+                <p>NUIT não pode duplicar</p>
+                <p>Sem token → 401</p>
+                <p>Login errado → erro na tela</p>
+              </div>
+              <div class="card azul">
+                <h3>Benefício</h3>
+                <p>Pega regressão cedo</p>
+                <p>Documenta o comportamento</p>
+                <p>Segurança para mudar código</p>
+                <p>Alimenta o pipeline (M16)</p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> amanhã alguém muda o Service. O teste avisa se a Ana quebrou — sem abrir o Swagger na mão.</div>
+          </div>
+          <aside class="lado">
+            <h3>Na prática</h3>
+            <p>Não testamos “tudo”.</p>
+            <p>Testamos as regras que doem se falharem.</p>
+            <p class="rodape">Poucos e bons &gt; muitos frágeis.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Pirâmide — três níveis</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <table class="def">
+              <tr><th>Nível</th><th>Ferramenta · o que prova</th><th>Qtd</th></tr>
+              <tr><td>Unitário</td><td><strong>Moq</strong> — NUIT no Service</td><td><strong>3</strong> Facts</td></tr>
+              <tr><td>Integração</td><td><strong>Factory</strong> — JWT na API</td><td><strong>4</strong> Facts</td></tr>
+              <tr><td>E2E</td><td><strong>Playwright</strong> — login no Chrome</td><td><strong>2</strong> specs</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>Soma do dia</h3>
+            <p><strong>3 + 4 = 7</strong> → <code>dotnet test</code></p>
+            <p><strong>2</strong> → <code>test:e2e</code></p>
+            <p><strong>9</strong> testes no total</p>
+            <p class="rodape">Base larga · topo estreito.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>AAA — a estrutura de todo teste</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="cards" style="grid-template-columns:1fr 1fr 1fr">
+              <div class="card">
+                <h3>Arrange</h3>
+                <p>Prepara os dados</p>
+                <p><code>nuit = "123"</code></p>
+              </div>
+              <div class="card azul">
+                <h3>Act</h3>
+                <p>Chama o método</p>
+                <p><code>CriarAsync(...)</code></p>
+              </div>
+              <div class="card code">
+                <h3>Assert</h3>
+                <p>Confere o resultado</p>
+                <p><code>Assert.False(ok)</code></p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> quem lê o teste depois entende a história em 3 atos — preparar, fazer, checar.</div>
+            <p class="passo-limpo">Comentários <code>// Arrange</code> · <code>// Act</code> · <code>// Assert</code> no gabarito — sigam o mesmo.</p>
+          </div>
+          <aside class="lado">
+            <h3>Regra de ouro</h3>
+            <p>Um Fact = uma ideia.</p>
+            <p>Nome do método conta a história.</p>
+            <p class="rodape"><code>Criar_NuitCurto_DeveFalhar</code></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>O que é TDD?</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>TDD</strong> = primeiro escreve a regra no teste, depois escreve o código que faz passar.</div>
+            <p>Ordem invertida em relação ao jeito comum:</p>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Jeito comum</h3>
+                <p>1. Código</p>
+                <p>2. Swagger na mão</p>
+                <p>3. “Parece ok”</p>
+              </div>
+              <div class="card azul">
+                <h3>Jeito TDD</h3>
+                <p>1. Escreve o <strong>teste</strong></p>
+                <p>2. Vê falhar (vermelho)</p>
+                <p>3. Escreve o mínimo para passar (verde)</p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> o teste vira a “prova” do que o sistema deve fazer — antes de inventar implementação.</div>
+          </div>
+          <aside class="lado">
+            <h3>Frase curta</h3>
+            <p>Primeiro a regra.</p>
+            <p>Depois o código.</p>
+            <p class="rodape">O teste manda; o código obedece.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>TDD com a Ana (exemplo)</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Regra que já conhecemos: NUIT tem que ter <strong>9 dígitos</strong>.</p>
+            <div class="fluxo">
+              <div class="passo">Vermelho<small>teste falha</small></div>
+              <div class="seta">→</div>
+              <div class="passo">Verde<small>código mínimo</small></div>
+              <div class="seta">→</div>
+              <div class="passo">Melhorar<small>refatorar</small></div>
+            </div>
+            <p class="passo-limpo">Ex.: NUIT <code>"123"</code> deve falhar → depois o <code>if</code> dos 9 dígitos.</p>
+            <div class="callout">Hoje as regras <strong>já existem</strong> — só escrevemos os testes AAA em cima.</div>
+          </div>
+          <aside class="lado">
+            <h3>Cuidado</h3>
+            <p>Se o Assert estiver errado, o verde <strong>mente</strong>.</p>
+            <p class="rodape">Leiam a mensagem do Assert.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>O que <em>não</em> testamos hoje</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="cards dois">
+              <div class="card">
+                <h3>Deixamos de fora</h3>
+                <p>Todo o CSS do portal</p>
+                <p>Todos os endpoints um a um</p>
+                <p>Performance / carga</p>
+                <p>UI pixel-perfect</p>
+              </div>
+              <div class="card azul">
+                <h3>Focamos nisto</h3>
+                <p>Regra do NUIT no Service</p>
+                <p>Login JWT (ok / 401)</p>
+                <p>Lista com e sem Bearer</p>
+                <p>Fluxo do atendente no browser</p>
+              </div>
+            </div>
+            <div class="callout red">Mais teste ≠ melhor. Teste frágil (que quebra com CSS) atrapalha a turma.</div>
+          </div>
+          <aside class="lado">
+            <h3>Lembrete</h3>
+            <p>Base = unitário.</p>
+            <p>Topo = 2 e2e só.</p>
+            <p class="rodape">Pirâmide, não bolo invertido.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="slide fill">
+      <h1>Primeiro a ideia</h1>
+      <p class="highlight">Ainda sem digitar.</p>
+      <p>Depois abrimos o Visual Studio e o VS Code — como nos outros dias.</p>
+    </section>
+
+    <section class="slide compact">
+      <h2>Ordem da aula (igual aos outros dias)</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="fluxo">
+              <div class="passo">1. Entender<small>Teoria —</small></div>
+              <div class="seta">→</div>
+              <div class="passo">2. Fazer<small>Passo N</small></div>
+              <div class="seta">→</div>
+              <div class="passo">3. Conferir<small>prova verde</small></div>
+            </div>
+            <p class="passo-limpo">Chip no slide: <strong>azul</strong> = Visual Studio · <strong>verde</strong> = VS Code.</p>
+            <p class="passo-limpo">Título do slide diz se é teoria ou passo prático.</p>
+            <p class="passo-limpo">Próximos slides: <strong>como copiar</strong> · <strong>como ler os passos</strong> (Onde · Faça · Prova).</p>
+          </div>
+          <aside class="lado">
+            <h3>Na sua pasta</h3>
+            <p><code>D:\fiap_turma_2</code></p>
+            <p><code>InssApi</code> + <code>inss-portal</code></p>
+            <p class="rodape">Igual ao Dia 3.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Como copiar do slide — 3 toques</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <div class="fluxo">
+              <div class="passo">1. Slide<small>selecionar caixa preta</small></div>
+              <div class="seta">→</div>
+              <div class="passo">2. Copiar<small><strong>Ctrl+C</strong></small></div>
+              <div class="seta">→</div>
+              <div class="passo">3. Editor<small>arquivo certo · Ctrl+V</small></div>
+            </div>
+            <div class="callout red cola"><strong>Erro da turma:</strong> só olham o slide. Têm que <strong>copiar</strong> (Ctrl+C) e levar pro editor (Ctrl+V).</div>
+            <p class="passo-limpo">Não redigem — <strong>copiam do slide</strong> e conferem no arquivo.</p>
+          </div>
+          <aside class="lado">
+            <h3>Prova</h3>
+            <p>Código visível no arquivo</p>
+            <p>Build / teste verde</p>
+            <p class="rodape">Todo Passo com caixa preta.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Como ler os passos — Onde · Faça · Prova</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Ferramenta + painel (VS, VS Code, terminal na <strong>raiz</strong> <code>fiap_turma_2</code>).</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Lista numerada — <strong>uma ação por vez</strong> · Enter após cada comando.</p>
+            <p class="onde"><span class="guia-tag prova">Prova</span> Caixa verde — comparem a <strong>estrutura</strong> (árvore do slide) com VS, VS Code ou Explorer.</p>
+            <p class="onde"><span class="guia-tag erro">Erro</span> Caixa vermelha — terminal no lugar errado, menu errado, pasta dentro de outra.</p>
+            <p class="passo-limpo"><span class="slide-badge copiar" style="font-size:.95rem">COPIAR</span> = caixa preta → editor · <span class="slide-badge executar" style="font-size:.95rem">EXECUTAR</span> = rodar testes · <span class="slide-badge leitura" style="font-size:.95rem">LEITURA</span> = entender · <span class="slide-badge pular" style="font-size:.95rem">PULAR</span> = referência.</p>
+            <div class="callout green">Terminal raiz: <code>...\fiap_turma_2&gt;</code> · Terminal portal: <code>...\inss-portal&gt;</code> · VS: <strong>Gerenciador</strong> · VS Code: <strong>Explorador</strong>.</div>
+          </div>
+          <aside class="lado">
+            <h3>2 painéis</h3>
+            <div class="arvore" style="font-size:.85rem">
+              <div class="bar">Visual Studio</div>
+              <ul><li class="pasta foco">Solução 'InssApi'</li><li class="indent pasta">InssApi / InssApi.Tests</li></ul>
+            </div>
+            <div class="arvore vscode" style="font-size:.85rem;margin-top:.25rem">
+              <div class="bar">VS Code · inss-portal</div>
+              <ul><li class="pasta foco">src/</li><li class="cs">package.json</li></ul>
+            </div>
+            <p class="rodape">Divisor → Passo 0.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact slide-mapa">
+      <h2>Manhã — o que vocês vão vendo (1/2)</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Antes de digitar: reconheçam isto na <strong>sua</strong> máquina.</p>
+            <div class="linha-tempo fit">
+              <div class="etapa">
+                <div class="num">VS</div>
+                <div>
+                  <div class="tit">Visual Studio · projeto <code>InssApi</code></div>
+                  <div class="oq">Barra de título: <code>InssApi</code> · F5 abre Swagger <strong>5088</strong></div>
+                  <div class="prova">Passos 0–11</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">0b</div>
+                <div>
+                  <div class="tit">VS Code · pasta <code>inss-portal</code></div>
+                  <div class="oq">Terminal: <code>npm run dev</code> → navegador <strong>5173</strong> · login Ana</div>
+                  <div class="prova">App do Dia 3 OK</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">1</div>
+                <div>
+                  <div class="tit">Terminal na <strong>raiz</strong> · nasce <code>InssApi.Tests</code></div>
+                  <div class="oq">Ao lado de <code>InssApi</code> — <strong>não</strong> dentro dela</div>
+                  <div class="prova">Passo 1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Na sua pasta</h3>
+            <div class="arvore vscode">
+              <div class="bar">D:\fiap_turma_2</div>
+              <ul>
+                <li class="pasta foco">InssApi/</li>
+                <li class="pasta foco">inss-portal/</li>
+                <li class="pasta novo">InssApi.Tests/</li>
+                <li class="indent cs novo">← aparece no Passo 1</li>
+              </ul>
+            </div>
+            <p class="provavel">Igual ao Dia 3 + pasta nova.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact slide-mapa">
+      <h2>Manhã — o que vocês vão vendo (2/2)</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Depois dos Passos — o que confirma que está certo:</p>
+            <div class="linha-tempo fit">
+              <div class="etapa">
+                <div class="num">11</div>
+                <div>
+                  <div class="tit">Test Explorer ou terminal</div>
+                  <div class="oq"><code>dotnet test</code> → <strong>Aprovado: 7</strong></div>
+                  <div class="prova">Só então Passo 12</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">12</div>
+                <div>
+                  <div class="tit">VS Code · <code>inss-portal</code></div>
+                  <div class="oq">Nova pasta <code>e2e/</code> + <code>playwright.config.js</code></div>
+                  <div class="prova">InssApi no F5</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">16</div>
+                <div>
+                  <div class="tit">Terminal do portal</div>
+                  <div class="oq"><code>npm run test:e2e</code> → <strong>2 passed</strong></div>
+                  <div class="prova">Manhã fechada</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Na sua pasta</h3>
+            <div class="arvore vscode">
+              <div class="bar">inss-portal</div>
+              <ul>
+                <li class="pasta">src/</li>
+                <li class="pasta novo foco">e2e/</li>
+                <li class="indent cs novo foco">portal.spec.js</li>
+                <li class="cs novo">playwright.config.js</li>
+              </ul>
+            </div>
+            <p class="provavel">Chrome abre sozinho nos testes.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Teoria — xUnit: o “Swagger” dos testes</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>xUnit</strong> = programa que roda seus testes sozinho — sem você clicar no Swagger.</div>
+            <p class="passo-limpo">No Dia 1 você provava na mão. Hoje o computador repete a prova toda vez.</p>
+            <table>
+              <tr><th>Dia 1–3</th><th>Hoje (M15)</th></tr>
+              <tr><td>Você clica no Swagger</td><td>O computador roda o Fact</td></tr>
+              <tr><td>Olho no 200 / 401</td><td><code>Assert</code> confere</td></tr>
+              <tr><td>Uma vez</td><td>Toda vez (<code>dotnet test</code>)</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>Por quê</h3>
+            <p>Service muda → teste avisa na hora</p>
+            <p><code>[Fact]</code> = um cenário</p>
+            <p class="rodape">Nome claro &gt; comentário longo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Teoria — Moq: o que é</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>Moq</strong> = substituto do banco. <strong>Setup</strong> = “perguntou X, responda Y” · <strong>Verify</strong> = “confira se perguntou”.</div>
+            <div class="fluxo">
+              <div class="passo">Service<small>regras</small></div>
+              <div class="seta">→</div>
+              <div class="passo">Moq<small>finge o repo</small></div>
+              <div class="seta">↛</div>
+              <div class="passo">SQLite<small>fora</small></div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Paralelo</h3>
+            <p>Moq ≈ ator no lugar do banco.</p>
+            <div class="callout green"><strong>Por quê:</strong> testa NUIT no Service — sem banco, sem HTTP.</div>
+            <p class="rodape">Sem F5 · sem Chrome.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Teoria — Integração: o que é</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>Integração</strong> = liga para a API pelo código — sem abrir o navegador. <strong>JWT</strong> = crachá · <strong>Middleware</strong> = porteiro.</div>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Sobe</h3>
+                <p>Controllers · JWT · Middleware</p>
+              </div>
+              <div class="card azul">
+                <h3>Não sobe</h3>
+                <p>React · Vite · clique do mouse</p>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Ferramenta</h3>
+            <p><code>WebApplicationFactory</code></p>
+            <p>+ <code>HttpClient</code></p>
+            <div class="callout green"><strong>Por quê:</strong> prova status + token que o portal do Dia 3 usa.</div>
+            <p class="rodape">API em memória.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Teoria — Factory: o que é</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>WebApplicationFactory</strong> = “F5 automático” no teste — sobe a InssApi com banco descartável.</div>
+          </div>
+          <aside class="lado">
+            <h3>Guarde</h3>
+            <p>Produção: <code>inss.db</code></p>
+            <p>Teste: arquivo temp</p>
+            <div class="callout green"><strong>Por quê:</strong> não mexe no <code>inss.db</code> da Ana.</div>
+            <p class="rodape">Próximo: 3 peças.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Teoria — Factory: Guid · EnsureCreated · Dispose</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <ul class="termo">
+              <li><strong>Guid</strong> — nome único do banco temp (cada teste, um arquivo)</li>
+              <li><strong>EnsureCreated</strong> — cria as tabelas nesse banco temp</li>
+              <li><strong>Dispose</strong> — apaga o arquivo temp no fim (faxina)</li>
+            </ul>
+            <p class="passo-limpo">Escrevemos o <code>Dispose</code> no Visual Studio (Passo 7b).</p>
+          </div>
+          <aside class="lado">
+            <h3>Dispose</h3>
+            <p>Faxina após o teste</p>
+            <p class="rodape">Máquina limpa.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Teoria — Playwright: o que é</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>Playwright</strong> = robô no site — digita e clica como a Ana. <strong>E2E</strong> = ponta a ponta (tela + API).</div>
+            <div class="card code">
+              <h3>Quem testa o quê</h3>
+              <p>Moq → Service · Factory → API · Playwright → <strong>tela</strong></p>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Precisa</h3>
+            <p>F5 na API (5088)</p>
+            <p>Vite sobe em 5173</p>
+            <p class="rodape">Passo 13 em diante.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Teoria — Playwright: o que testamos hoje</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Só <strong>2</strong> fluxos — login errado e login da Ana. E2E é lento; o resto já está no Moq e na Factory.</p>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Login inválido</h3>
+                <p>Robô digita senha errada</p>
+                <p>Prova: alerta na tela</p>
+              </div>
+              <div class="card azul">
+                <h3>Login válido</h3>
+                <p>Robô entra como Ana</p>
+                <p>Prova: lista de contribuintes</p>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Arquivo</h3>
+            <p><code>inss-portal/e2e/portal.spec.js</code></p>
+            <p class="rodape">Passo 13 em diante.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Unitário × integração — lado a lado</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table>
+              <tr><th></th><th>Unitário</th><th>Integração</th></tr>
+              <tr><td>Arquivo</td><td>ContribuinteServiceTests</td><td>AuthApiTests</td></tr>
+              <tr><td>Sobe</td><td>Só o Service</td><td>API HTTP em memória</td></tr>
+              <tr><td>Banco</td><td>Moq (não tem)</td><td>SQLite temp</td></tr>
+              <tr><td>JWT</td><td>Não</td><td>Sim</td></tr>
+              <tr><td>Velocidade</td><td>Muito rápido</td><td>Rápido</td></tr>
+              <tr><td>Hoje</td><td>3 Facts</td><td>4 Facts</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>Ordem</h3>
+            <p>Primeiro Moq.</p>
+            <p>Depois Factory.</p>
+            <p class="rodape">Próximo: mãos na massa.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide fill divisor-pratica">
+      <h1>Façam agora — Visual Studio</h1>
+      <p class="highlight">Passos 0 a 11 · mesmo <code>InssApi</code> do Dia 3</p>
+      <div class="fluxo">
+        <div class="passo">1. Slide<small>caixa preta</small></div>
+        <div class="seta">→</div>
+        <div class="passo">2. Copiar<small><strong>Ctrl+C</strong></small></div>
+        <div class="seta">→</div>
+        <div class="passo">3. Visual Studio<small>arquivo · Ctrl+V</small></div>
+      </div>
+      <p class="instr-cola"><strong>Copiem do slide</strong> — não redigem letra por letra.</p>
+      <p class="aviso-cola">Copiou no slide mas não levou pro editor? O projeto fica vazio.</p>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 0 — abrir o mesmo projeto do Dia 3</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Explorer Windows → raiz <code>C:\fiap_turma_2</code> (ou <code>D:\</code>).</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol>
+              <li><strong>Visual Studio</strong> → <strong>Abrir um projeto</strong> → <code>InssApi\InssApi.csproj</code></li>
+              <li><strong>VS Code</strong> → <strong>Abrir pasta</strong> → <code>inss-portal</code> (não a raiz inteira)</li>
+            </ol>
+            <div class="arvore-dupla">
+              <div class="arvore vscode">
+                <div class="bar">Explorer · fiap_turma_2</div>
+                <ul>
+                  <li class="pasta foco">InssApi\</li>
+                  <li class="pasta foco">inss-portal\</li>
+                  <li class="hint">sem InssApi.Tests ainda</li>
+                </ul>
+              </div>
+              <div class="arvore">
+                <div class="bar">Gerenciador · Visual Studio</div>
+                <ul>
+                  <li class="pasta foco">Solução 'InssApi' <span class="hint">(1 de 1)</span></li>
+                  <li class="indent pasta foco">InssApi</li>
+                  <li class="indent2 cs foco">Program.cs · Controllers · Services…</li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> 2 pastas na raiz · VS mostra só <code>InssApi</code> · VS Code mostra <code>src\</code> e <code>package.json</code>.</div>
+          </div>
+          <aside class="lado">
+            <h3>2 programas</h3>
+            <p>Azul = InssApi.csproj</p>
+            <p>Verde = pasta inss-portal</p>
+            <p class="rodape">Próximo: Passo 0b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 0b — prova antes dos testes</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Visual Studio (InssApi) + VS Code (inss-portal) — os dois abertos.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol>
+              <li>Visual Studio → <strong>F5</strong> → Swagger <strong>5088</strong></li>
+              <li>VS Code → terminal <code>...\inss-portal&gt;</code> → <code>npm run dev</code></li>
+              <li>Navegador <strong>5173</strong> → login <code>ana@inss.gov.mz</code> / <code>1234</code></li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> barra VS = depurando · terminal VS Code = Vite em 5173 · Ana na lista.</div>
+            <div class="callout red"><strong>Erro:</strong> falhou aqui → consertem o Dia 3 antes do Passo 1.</div>
+          </div>
+          <aside class="lado">
+            <h3>2 portas</h3>
+            <p>5088 = API (VS)</p>
+            <p>5173 = portal (VS Code)</p>
+            <p class="rodape">Próximo: Passo 1.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 1 — Visual Studio · criar xUnit</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Terminal na <strong>raiz</strong> <code>fiap_turma_2</code> — Developer PowerShell do VS ou prompt externo.</p>
+            <div class="callout red"><strong>Erro:</strong> prompt em <code>InssApi&gt;</code> → rodem <code>cd ..</code> até ver <code>fiap_turma_2&gt;</code>.</div>
+            <p class="onde"><span class="guia-tag">Faça</span> Um comando · Enter · próximo:</p>
+            <div class="term-bar">TERMINAL — raiz fiap_turma_2</div>
+            <ol>
+              <li><code>cd C:\fiap_turma_2</code></li>
+              <li><code>dotnet new xunit -n InssApi.Tests -o InssApi.Tests</code></li>
+              <li><code>dotnet add InssApi.Tests\InssApi.Tests.csproj reference InssApi\InssApi.csproj</code></li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> Explorer mostra <code>InssApi.Tests\</code> <strong>ao lado</strong> de <code>InssApi\</code> — não dentro.</div>
+          </div>
+          <aside class="lado">
+            <div class="arvore vscode">
+              <div class="bar">Explorer · depois do Passo 1</div>
+              <ul>
+                <li class="pasta">InssApi\</li>
+                <li class="pasta">inss-portal\</li>
+                <li class="pasta novo foco">InssApi.Tests\</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: Passo 1a.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 1a — InssApi.Tests no Visual Studio</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Gerenciador de Soluções — linha de <strong>cima</strong> (Solução), não o projeto InssApi.</p>
+            <div class="explica">A pasta já existe no disco — falta o VS <strong>enxergar</strong> o projeto de testes.</div>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <div class="callout red"><strong>Erro comum:</strong> botão direito no projeto <code>InssApi</code> → só aparece <em>Item Existente</em> (arquivo). Isso <strong>não</strong> serve.</div>
+            <ol>
+              <li><strong>Gerenciador de Soluções</strong> — clique na linha de <strong>cima</strong>: <code>Solução 'InssApi' (1 de 1 projeto)</code></li>
+              <li>Botão direito <strong>nessa linha da Solução</strong> (não no InssApi de baixo)</li>
+              <li><strong>Adicionar</strong> → <strong>Projeto Existente…</strong></li>
+              <li>Abrir <code>C:\fiap_turma_2\InssApi.Tests\InssApi.Tests.csproj</code></li>
+            </ol>
+            <p class="passo-limpo">Não achou? Menu <strong>Arquivo</strong> → <strong>Adicionar</strong> → <strong>Projeto Existente…</strong></p>
+            <div class="callout green"><strong>Prova:</strong> linha de cima vira <strong>2 de 2 projetos</strong> · em <code>InssApi.Tests</code> apague <code>UnitTest1.cs</code>.</div>
+          </div>
+          <aside class="lado">
+            <div class="arvore">
+              <div class="bar">Gerenciador · depois do 1a</div>
+              <ul>
+                <li class="pasta foco">Solução 'InssApi' <span class="hint">(2 de 2)</span></li>
+                <li class="indent pasta">InssApi</li>
+                <li class="indent pasta novo">InssApi.Tests</li>
+                <li class="indent2 hint">UnitTest1.cs → apagar</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: Passo 1b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 1b — Visual Studio · pacotes NuGet</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Terminal na <strong>raiz</strong> <code>fiap_turma_2</code> (mesmo do Passo 1).</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Um comando · Enter · próximo:</p>
+            <div class="term-bar">TERMINAL — raiz fiap_turma_2</div>
+            <ol>
+              <li><code>dotnet add InssApi.Tests\InssApi.Tests.csproj package Moq</code></li>
+              <li><code>dotnet add InssApi.Tests\InssApi.Tests.csproj package Microsoft.AspNetCore.Mvc.Testing</code></li>
+              <li><code>dotnet add InssApi.Tests\InssApi.Tests.csproj package Microsoft.EntityFrameworkCore.Sqlite</code></li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> Gerenciador → <strong>InssApi.Tests</strong> → Dependências → Pacotes: Moq, Mvc.Testing, Sqlite.</div>
+          </div>
+          <aside class="lado">
+            <h3>Para quê</h3>
+            <p>Moq → unitário</p>
+            <p>Mvc.Testing → Factory</p>
+            <p>Sqlite → DB temp</p>
+            <p class="rodape">Próximo: Passo 2.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 2 — Visual Studio · partial Program</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Gerenciador → projeto <strong>InssApi</strong> → <code>Program.cs</code> (não InssApi.Tests).</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Visual Studio → <code>InssApi\Program.cs</code></li>
+              <li>Cursor <strong>depois</strong> de <code>app.Run();</code></li>
+              <li>Slide: selecionar caixa abaixo → <strong>Ctrl+C</strong></li>
+              <li>Visual Studio → <strong>Ctrl+V</strong></li>
+            </ol>
+            <div class="tela">
+              <div class="tela-bar">Program.cs — copiar isto no final</div>
+              <div class="tela-body denso">app.<span class="m">Run</span>();
+
+<span class="c">// Preciso para WebApplicationFactory nos testes de integração (M15)</span>
+<span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="t">Program</span> { }</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Prova</h3>
+            <p>Texto no Program.cs</p>
+            <p>Build compila</p>
+            <p class="rodape">Próximo: Passo 2c.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 2c — prova · estrutura do projeto</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Comparem o <strong>Gerenciador de Soluções</strong> (VS) e o <strong>Explorer</strong> (Windows) com as árvores abaixo.</p>
+            <div class="arvore-dupla">
+              <div class="arvore">
+                <div class="bar">Gerenciador de Soluções · Visual Studio</div>
+                <ul>
+                  <li class="pasta foco">Solução 'InssApi' <span class="hint">(2 de 2 projetos)</span></li>
+                  <li class="indent pasta">InssApi</li>
+                  <li class="indent2 cs foco">Program.cs <span class="hint">← partial class Program</span></li>
+                  <li class="indent pasta novo">InssApi.Tests</li>
+                  <li class="indent2">Dependências → Moq · Mvc.Testing · Sqlite</li>
+                  <li class="indent2 hint">UnitTest1.cs apagado</li>
+                </ul>
+              </div>
+              <div class="arvore vscode">
+                <div class="bar">Explorer · C:\fiap_turma_2</div>
+                <ul>
+                  <li class="pasta foco">InssApi\</li>
+                  <li class="pasta foco">inss-portal\</li>
+                  <li class="pasta novo">InssApi.Tests\ <span class="hint">← ao lado, não dentro</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>Prova Build:</strong> menu <strong>Compilar</strong> → barra inferior <em>Nenhum problema encontrado</em>.</div>
+          </div>
+          <aside class="lado">
+            <h3>3 checks</h3>
+            <p>① partial no Program.cs</p>
+            <p>② Build verde</p>
+            <p>③ 2 projetos + NuGet</p>
+            <p class="rodape">OK → Passo 3</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 3 — criar ContribuinteServiceTests.cs</h2>
+      <div class="content center-y">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — só os using + namespace</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Gerenciador de Soluções → projeto <strong>InssApi.Tests</strong> (não a Solução de cima).</p>
+            <div class="callout red"><strong>Erro:</strong> botão direito na <strong>Solução</strong> — use no <strong>projeto InssApi.Tests</strong>.</div>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Gerenciador → botão direito em <strong>InssApi.Tests</strong> → <strong>Adicionar → Classe</strong> → nome <code>ContribuinteServiceTests.cs</code></li>
+              <li>Slide → caixa abaixo → Ctrl+C</li>
+              <li>Arquivo novo → Ctrl+V (só os <code>using</code>)</li>
+            </ol>
+            <div class="tela">
+              <div class="tela-bar">ContribuinteServiceTests.cs</div>
+              <div class="tela-body denso"><span class="k">using</span> InssApi.Models;
+<span class="k">using</span> InssApi.Repositories;
+<span class="k">using</span> InssApi.Services;
+<span class="k">using</span> Microsoft.Extensions.Logging.Abstractions;
+<span class="k">using</span> Moq;
+
+<span class="k">namespace</span> InssApi.Tests;</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <div class="arvore">
+              <div class="bar">Gerenciador · InssApi.Tests</div>
+              <ul>
+                <li class="pasta novo foco">InssApi.Tests</li>
+                <li class="indent2 cs novo foco">ContribuinteServiceTests.cs</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: Passo 3b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 3b — setup Moq + Service</h2>
+      <div class="content center-y">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — caixa preta → Ctrl+C → editor</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Visual Studio → <code>InssApi.Tests\ContribuinteServiceTests.cs</code></p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Apaguem o template <code>internal class { }</code> que o VS criou</li>
+              <li>Slide → caixa abaixo → <strong>Ctrl+C</strong></li>
+              <li>Depois dos <code>using</code> → <strong>Ctrl+V</strong> (classe + construtor)</li>
+            </ol>
+            <div class="tela">
+              <div class="tela-bar">ContribuinteServiceTests.cs — setup</div>
+              <div class="tela-body denso"><span class="k">public</span> <span class="k">class</span> <span class="t">ContribuinteServiceTests</span>
+{
+  <span class="k">private</span> <span class="k">readonly</span> <span class="t">Mock</span>&lt;<span class="t">IContribuinteRepository</span>&gt; _repo = <span class="k">new</span>();
+  <span class="k">private</span> <span class="k">readonly</span> <span class="t">ContribuinteService</span> _sut;
+
+  <span class="k">public</span> <span class="m">ContribuinteServiceTests</span>()
+  {
+    _sut = <span class="k">new</span> <span class="t">ContribuinteService</span>(
+      _repo.Object,
+      <span class="t">NullLogger</span>&lt;<span class="t">ContribuinteService</span>&gt;.Instance);
+  }
+}</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs</div>
+              <ul>
+                <li class="cs">using … Moq</li>
+                <li class="pasta foco">class ContribuinteServiceTests</li>
+                <li class="indent cs foco">_repo · _sut</li>
+                <li class="indent cs foco">construtor()</li>
+                <li class="indent hint">Facts → Passo 4</li>
+              </ul>
+            </div>
+            <p class="rodape">Prova: compila · Próximo: 3c.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Passo 3c — teoria · Setup e Verify</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge leitura">SÓ LEITURA — não copiem · não abram editor</span>
+            <p class="passo-limpo">Entendam agora — usaremos nos Passos <strong>4c</strong>, <strong>5</strong> e <strong>6a</strong>.</p>
+            <div class="cards dois">
+              <div class="card azul">
+                <h3>Setup</h3>
+                <p>“Quando alguém chamar X, devolva Y.”</p>
+                <p><code>_repo.Setup(...).ReturnsAsync(...)</code></p>
+                <p>Usamos no NUIT duplicado e no válido.</p>
+              </div>
+              <div class="card">
+                <h3>Verify</h3>
+                <p>“Confirma se chamou (ou não) o método.”</p>
+                <p><code>Times.Never</code> / <code>Times.Once</code></p>
+                <p>NUIT curto → nunca grava.</p>
+              </div>
+            </div>
+            <div class="explica"><code>It.IsAny&lt;T&gt;()</code> = “aceito qualquer valor deste tipo” — não precisamos inventar o token de cancelamento.</div>
+          </div>
+          <aside class="lado">
+            <h3>Próximo</h3>
+            <p><strong>Passo 4</strong> = 1º Fact</p>
+            <p>Copiem do slide</p>
+            <p class="rodape">Não é só exemplo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact slide-mapa">
+      <h2>Passos 3–6 — mapa do arquivo</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Um arquivo · <code>ContribuinteServiceTests.cs</code> · vai <strong>crescendo</strong> a cada passo com badge vermelho:</p>
+            <table>
+              <tr><th>Passo</th><th>Ação</th><th>O que entra no arquivo</th></tr>
+              <tr><td>3</td><td><span class="slide-badge copiar" style="font-size:.8rem;padding:.1rem .35rem">COPIAR</span></td><td>using + namespace</td></tr>
+              <tr><td>3b</td><td><span class="slide-badge copiar" style="font-size:.8rem;padding:.1rem .35rem">COPIAR</span></td><td>classe + construtor Moq</td></tr>
+              <tr><td>3c</td><td><span class="slide-badge leitura" style="font-size:.8rem;padding:.1rem .35rem">LEITURA</span></td><td>nada — teoria Setup/Verify</td></tr>
+              <tr><td>4 + 4b</td><td><span class="slide-badge copiar" style="font-size:.8rem;padding:.1rem .35rem">COPIAR</span></td><td>1º [Fact] NuitCurto (bloco inteiro)</td></tr>
+              <tr><td>4c</td><td><span class="slide-badge copiar" style="font-size:.8rem;padding:.1rem .35rem">COPIAR</span></td><td>Verify no fim do 1º Fact</td></tr>
+              <tr><td>5 + código</td><td><span class="slide-badge copiar" style="font-size:.8rem;padding:.1rem .35rem">COPIAR</span></td><td>2º [Fact] NuitDuplicado (bloco inteiro)</td></tr>
+              <tr><td>5b</td><td><span class="slide-badge leitura" style="font-size:.8rem;padding:.1rem .35rem">LEITURA</span></td><td>nada</td></tr>
+              <tr><td>6 + 6a</td><td><span class="slide-badge copiar" style="font-size:.8rem;padding:.1rem .35rem">COPIAR</span></td><td>3º Fact + Verify</td></tr>
+              <tr><td>6c/6d</td><td><span class="slide-badge executar" style="font-size:.8rem;padding:.1rem .35rem">EXECUTAR</span></td><td>3 verdes</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs · final 6b</div>
+              <ul>
+                <li class="cs">using … Xunit · Moq</li>
+                <li class="pasta foco">class</li>
+                <li class="indent cs">construtor()</li>
+                <li class="indent cs foco">[Fact] NuitCurto + Verify</li>
+                <li class="indent cs foco">[Fact] NuitDuplicado</li>
+                <li class="indent cs foco">[Fact] DadosValidos + Verify</li>
+              </ul>
+            </div>
+            <p class="rodape">Prova 6b: 3 Facts.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 4 — onde colar o 1º teste</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — próximo slide = bloco inteiro</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Visual Studio → <code>InssApi.Tests\ContribuinteServiceTests.cs</code></p>
+            <p class="onde"><span class="guia-tag">Faça</span> Antes de copiar:</p>
+            <ol class="colar">
+              <li>Topo do arquivo → linha <code>using Xunit;</code> (se faltar, adicionem)</li>
+              <li>Cursor na linha <strong>depois</strong> do <code>}</code> do construtor</li>
+              <li>Começou só <code>var nuit = "123";</code>? → <strong>apaguem</strong> · copiem de novo no slide 4b</li>
+            </ol>
+            <div class="callout red"><strong>Erro da turma:</strong> copiar <strong>só uma linha</strong> dentro do método. Têm que colar o bloco <strong>inteiro</strong>: de <code>[Fact]</code> até o <code>}</code> final.</div>
+            <div class="fluxo">
+              <div class="passo">construtor()<small>linha acima</small></div>
+              <div class="seta">↓</div>
+              <div class="passo">[Fact] inteiro<small>COLE AQUI</small></div>
+              <div class="seta">↓</div>
+              <div class="passo">}<small>fecha class</small></div>
+            </div>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs</div>
+              <ul>
+                <li class="cs foco">using Xunit;</li>
+                <li class="indent cs">construtor() { … }</li>
+                <li class="indent cs novo foco">← cursor AQUI</li>
+                <li class="indent cs novo foco">[Fact] Criar_NuitCurto…</li>
+                <li class="indent cs">Assert.False…</li>
+                <li class="indent cs">Assert.Contains…</li>
+                <li class="indent cs">Assert.Null…</li>
+                <li class="indent cs">} ← fecha o Fact</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: slide 4b · código.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 4b — código · copiar bloco inteiro</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">SELECIONEM TUDO NA CAIXA → Ctrl+C → Ctrl+V</span>
+            <p class="passo-limpo">De <code>[Fact]</code> até o último <code>}</code> — <strong>10 linhas</strong> · sem Verify (Passo 4c).</p>
+            <div class="tela">
+              <div class="tela-bar">Selecionar TUDO · Ctrl+C · colar no editor</div>
+              <div class="tela-body denso">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Criar_NuitCurto_DeveFalhar</span>()
+{
+  <span class="k">var</span> nuit = <span class="s">"123"</span>;
+  <span class="k">var</span> (ok, erro, criado) = <span class="k">await</span> _sut.<span class="m">CriarAsync</span>(nuit, <span class="s">"Ana"</span>, CancellationToken.None);
+  Assert.<span class="m">False</span>(ok);
+  Assert.<span class="m">Contains</span>(<span class="s">"9 dígitos"</span>, erro);
+  Assert.<span class="m">Null</span>(criado);
+}</div>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> barra inferior <em>Nenhum problema</em> · Test Explorer = <strong>1</strong> teste verde.</div>
+          </div>
+          <aside class="lado">
+            <h3>Checklist</h3>
+            <p>☑ <code>using Xunit;</code></p>
+            <p>☑ <code>[Fact]</code> visível</p>
+            <p>☑ 3 Asserts</p>
+            <p>☑ <code>}</code> fecha o método</p>
+            <p class="rodape">Verify → Passo 4c.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 4c — Verify · Times.Never</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — linha Verify no fim do Fact</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Mesmo arquivo · dentro de <code>Criar_NuitCurto_DeveFalhar</code> · cursor <strong>depois</strong> do último <code>Assert</code>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Slide → caixa abaixo → <strong>Ctrl+C</strong></li>
+              <li>Antes do <code>}</code> do método → <strong>Ctrl+V</strong></li>
+            </ol>
+            <div class="tela">
+              <div class="tela-bar">colar no fim do Fact NuitCurto</div>
+              <div class="tela-body denso">  _repo.<span class="m">Verify</span>(r =&gt; r.<span class="m">AdicionarAsync</span>(
+    It.<span class="m">IsAny</span>&lt;<span class="t">Contribuinte</span>&gt;(), It.<span class="m">IsAny</span>&lt;CancellationToken&gt;()), Times.Never);</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs</div>
+              <ul>
+                <li class="indent cs foco">[Fact] Criar_NuitCurto…</li>
+                <li class="indent2 cs novo foco">Verify Times.Never</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: Passo 5.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 5 — onde colar o 2º teste</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — próximo slide = bloco inteiro</span>
+            <p class="onde"><span class="guia-tag">Onde</span> <code>ContribuinteServiceTests.cs</code> — cursor <strong>depois</strong> do <code>}</code> do Fact NuitCurto.</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Próximo slide → selecionar <strong>toda</strong> a caixa → Ctrl+C → Ctrl+V.</p>
+            <div class="fluxo">
+              <div class="passo">NuitCurto + Verify<small>já feito</small></div>
+              <div class="seta">↓</div>
+              <div class="passo">[Fact] NuitDuplicado<small>COLE AQUI</small></div>
+            </div>
+            <div class="callout red"><strong>Erro:</strong> cortou no meio? Copiem até o <code>}</code> final — bloco inteiro.</div>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs</div>
+              <ul>
+                <li class="indent cs">[Fact] Criar_NuitCurto…</li>
+                <li class="indent cs novo foco">← cursor AQUI</li>
+                <li class="indent cs novo foco">[Fact] Criar_NuitDuplicado…</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: código.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact codigo-full">
+      <h2>Passo 5 — código · NuitDuplicado</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">Ctrl+C na caixa · Ctrl+V no editor · inclui o }</span>
+            <div class="tela">
+              <div class="tela-bar">Criar_NuitDuplicado_DeveFalhar — copiar TUDO</div>
+              <div class="tela-body mini">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Criar_NuitDuplicado_DeveFalhar</span>()
+{
+  _repo.<span class="m">Setup</span>(r =&gt; r.<span class="m">ObterPorNuitAsync</span>(<span class="s">"123456789"</span>, It.<span class="m">IsAny</span>&lt;CancellationToken&gt;()))
+    .<span class="m">ReturnsAsync</span>(<span class="k">new</span> <span class="t">Contribuinte</span> { Id = <span class="n">1</span>, Nuit = <span class="s">"123456789"</span>, Nome = <span class="s">"Outra"</span> });
+  <span class="k">var</span> (ok, erro, _) = <span class="k">await</span> _sut.<span class="m">CriarAsync</span>(<span class="s">"123456789"</span>, <span class="s">"Ana"</span>, CancellationToken.None);
+  Assert.<span class="m">False</span>(ok);
+  Assert.<span class="m">Contains</span>(<span class="s">"já cadastrado"</span>, erro);
+}</div>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> última linha visível = <code>}</code> · Test Explorer = <strong>2</strong> testes.</div>
+          </div>
+          <aside class="lado">
+            <h3>Checklist</h3>
+            <p>☑ Setup Moq</p>
+            <p>☑ CriarAsync</p>
+            <p>☑ 2 Asserts</p>
+            <p>☑ <code>}</code> fecha Fact</p>
+            <p class="rodape">Teoria → Passo 5b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Passo 5b — teoria · o que o Setup ensinou</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge leitura">SÓ LEITURA — não copiem</span>
+            <div class="explica">Sem o Setup, <code>ObterPorNuitAsync</code> devolveria o padrão do Moq (null) — e o teste de duplicado <strong>passaria errado</strong> (acharia que está livre).</div>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Com Setup</h3>
+                <p>Retorna contribuinte existente</p>
+                <p>→ “já cadastrado”</p>
+              </div>
+              <div class="card azul">
+                <h3>Sem Setup</h3>
+                <p>Retorna null</p>
+                <p>→ Service tenta criar</p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> o Moq precisa responder o cenário certo — senão o teste mente que está verde.</div>
+          </div>
+          <aside class="lado">
+            <h3>Compare</h3>
+            <p>Duplicado = ReturnsAsync(obj)</p>
+            <p>Válido = ReturnsAsync(null)</p>
+            <p class="rodape">Próximo slide.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 6 — onde colar o 3º teste</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — próximo slide = bloco inteiro</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Depois do <code>}</code> do Fact NuitDuplicado.</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Próximo slide → caixa inteira → Ctrl+C → Ctrl+V · Verify no Passo 6a.</p>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs</div>
+              <ul>
+                <li class="indent cs">NuitCurto · NuitDuplicado</li>
+                <li class="indent cs novo foco">← cursor · [Fact] DadosValidos</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: código.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact codigo-full">
+      <h2>Passo 6 — código · DadosValidos</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">Ctrl+C na caixa · Ctrl+V · inclui o }</span>
+            <div class="tela">
+              <div class="tela-bar">Criar_DadosValidos_DeveSalvar — copiar TUDO</div>
+              <div class="tela-body mini">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Criar_DadosValidos_DeveSalvar</span>()
+{
+  _repo.<span class="m">Setup</span>(r =&gt; r.<span class="m">ObterPorNuitAsync</span>(<span class="s">"987654321"</span>, It.<span class="m">IsAny</span>&lt;CancellationToken&gt;()))
+    .<span class="m">ReturnsAsync</span>((<span class="t">Contribuinte</span>?)null);
+  <span class="k">var</span> (ok, erro, criado) = <span class="k">await</span> _sut.<span class="m">CriarAsync</span>(
+    <span class="s">"987654321"</span>, <span class="s">"Ana Mucavel"</span>, CancellationToken.None);
+  Assert.<span class="m">True</span>(ok);
+  Assert.<span class="m">Null</span>(erro);
+  Assert.<span class="m">NotNull</span>(criado);
+  Assert.<span class="m">Equal</span>(<span class="s">"Ana Mucavel"</span>, criado!.Nome);
+}</div>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> última linha = <code>}</code> · Test Explorer = <strong>3</strong> testes.</div>
+          </div>
+          <aside class="lado">
+            <h3>Checklist</h3>
+            <p>☑ Setup null</p>
+            <p>☑ 4 Asserts</p>
+            <p>☑ <code>}</code> fecha Fact</p>
+            <p class="rodape">Verify → Passo 6a.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 6a — Verify · Times.Once</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — 2 linhas Verify</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Dentro de <code>Criar_DadosValidos_DeveSalvar</code> · depois do último <code>Assert</code>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Slide → caixa abaixo → <strong>Ctrl+C</strong></li>
+              <li>Antes do <code>}</code> do Fact → <strong>Ctrl+V</strong></li>
+            </ol>
+            <div class="tela">
+              <div class="tela-bar">colar no fim do Fact DadosValidos</div>
+              <div class="tela-body denso">  _repo.<span class="m">Verify</span>(r =&gt; r.<span class="m">AdicionarAsync</span>(
+    It.<span class="m">IsAny</span>&lt;<span class="t">Contribuinte</span>&gt;(), It.<span class="m">IsAny</span>&lt;CancellationToken&gt;()), Times.Once);
+  _repo.<span class="m">Verify</span>(r =&gt; r.<span class="m">SalvarAsync</span>(
+    It.<span class="m">IsAny</span>&lt;CancellationToken&gt;()), Times.Once);</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs</div>
+              <ul>
+                <li class="indent cs foco">DadosValidos + Verify Once</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: Passo 6b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 6b — prova · arquivo com 3 Facts</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag prova">Prova</span> Antes de rodar: confiram se o <strong>arquivo</strong> tem os 3 métodos abaixo.</p>
+            <div class="arvore">
+              <div class="bar">Gerenciador · InssApi.Tests</div>
+              <ul>
+                <li class="pasta foco">InssApi.Tests</li>
+                <li class="indent2 cs foco">ContribuinteServiceTests.cs</li>
+                <li class="indent2 hint">sem AuthApiTests ainda</li>
+              </ul>
+            </div>
+            <div class="arvore arquivo">
+              <div class="bar">ContribuinteServiceTests.cs · abrir no editor</div>
+              <ul>
+                <li class="indent cs foco">Criar_NuitCurto_DeveFalhar</li>
+                <li class="indent cs foco">Criar_NuitDuplicado_DeveFalhar</li>
+                <li class="indent cs foco">Criar_DadosValidos_DeveSalvar</li>
+              </ul>
+            </div>
+            <div class="callout green"><strong>OK se:</strong> 3 métodos com <code>[Fact]</code> · build compila. <strong>Ainda não</strong> vá ao Passo 7 — falta executar (Passo 6c).</div>
+          </div>
+          <aside class="lado">
+            <h3>3 Facts</h3>
+            <p>NuitCurto + Verify</p>
+            <p>NuitDuplicado</p>
+            <p>DadosValidos + Verify</p>
+            <p class="rodape">Próximo: Passo 6c · rodar.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 6c — executar · Explorador de Testes</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge executar">EXECUTAR AGORA — 3 testes · antes do Passo 7</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Visual Studio → menu superior <strong>Teste</strong> → <strong>Explorador de Testes</strong>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Um passo · depois o próximo:</p>
+            <ol class="colar">
+              <li><strong>Compilar</strong> → menu <strong>Compilar</strong> → <strong>Compilar Solução</strong></li>
+              <li>Barra inferior deve mostrar: <em>Nenhum problema encontrado</em></li>
+              <li><strong>Teste</strong> → <strong>Explorador de Testes</strong> (abre painel — embaixo ou lateral)</li>
+              <li>No painel: botão <strong>Executar todos os testes na solução</strong> (▶▶ ícone duplo)</li>
+              <li>Aguardar terminar · expandir árvore até ver os 3 nomes</li>
+            </ol>
+            <div class="arvore testes">
+              <div class="bar">Explorador de Testes · PROVA (3 verdes)</div>
+              <ul>
+                <li class="pasta foco">InssApi.Tests (3)</li>
+                <li class="indent pasta">ContribuinteServiceTests (3)</li>
+                <li class="indent2 ok">✓ Criar_NuitCurto_DeveFalhar</li>
+                <li class="indent2 ok">✓ Criar_NuitDuplicado_DeveFalhar</li>
+                <li class="indent2 ok">✓ Criar_DadosValidos_DeveSalvar</li>
+                <li class="hint">Rodapé do painel: Aprovado: 3 · Com falha: 0</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Não achou?</h3>
+            <p>Atalho: <code>Ctrl+E</code> depois <code>T</code></p>
+            <p>Menu: <strong>Exibir</strong> → <strong>Explorador de Testes</strong></p>
+            <div class="callout green"><strong>OK → Passo 7</strong></div>
+            <div class="callout red"><strong>Vermelho?</strong> Clique no ✗ · leia Assert · não avance.</div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 6d — executar · terminal (alternativa)</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge executar">MESMA PROVA do 6c · escolham UM caminho</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Terminal na <strong>raiz</strong> <code>fiap_turma_2</code> (Developer PowerShell do VS ou prompt externo).</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Prompt: <code>PS C:\fiap_turma_2&gt;</code> — se estiver em <code>InssApi&gt;</code>, rodem <code>cd ..</code></li>
+              <li>Digitem o comando abaixo · Enter</li>
+              <li>Leiam a última linha da saída</li>
+            </ol>
+            <div class="term-bar">TERMINAL — raiz fiap_turma_2</div>
+            <pre class="term vs">dotnet test InssApi.Tests
+
+Aprovado!  – Com falha:     0, Aprovado:     3, Ignorado:     0, Total:     3</pre>
+            <div class="callout green"><strong>Prova:</strong> <code>Aprovado: 3</code> · <code>Com falha: 0</code> → Passo 7.</div>
+          </div>
+          <aside class="lado">
+            <h3>6c ou 6d</h3>
+            <p>Explorador = visual</p>
+            <p>Terminal = texto</p>
+            <p class="rodape">Próximo: mapa 6→12.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact slide-mapa">
+      <h2>De 6c em diante — mapa da manhã</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Vocês estão aqui ↓ · sigam a coluna <strong>Ação</strong>:</p>
+            <table>
+              <tr><th>Passo</th><th>Ação</th><th>Prova</th></tr>
+              <tr><td>6c/6d</td><td><span class="slide-badge executar" style="font-size:.75rem;padding:.08rem .3rem">EXECUTAR</span></td><td>3 testes verdes</td></tr>
+              <tr><td>7</td><td><span class="slide-badge leitura" style="font-size:.75rem;padding:.08rem .3rem">LEITURA</span></td><td>entender Factory</td></tr>
+              <tr><td>7a–7b</td><td><span class="slide-badge copiar" style="font-size:.75rem;padding:.08rem .3rem">COPIAR</span></td><td>AuthApiTests.cs inteiro</td></tr>
+              <tr><td>7c–10</td><td><span class="slide-badge pular" style="font-size:.75rem;padding:.08rem .3rem">PULAR</span></td><td>só referência → Passo 11</td></tr>
+              <tr><td>11</td><td><span class="slide-badge executar" style="font-size:.75rem;padding:.08rem .3rem">EXECUTAR</span></td><td>7 testes verdes</td></tr>
+              <tr><td>12–16</td><td><span class="slide-badge copiar" style="font-size:.75rem;padding:.08rem .3rem">COPIAR</span></td><td>VS Code · 2 e2e</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <div class="arvore">
+              <div class="bar">InssApi.Tests · alvo final 11</div>
+              <ul>
+                <li class="indent cs foco">ContribuinteServiceTests (3)</li>
+                <li class="indent cs foco">AuthApiTests (4)</li>
+                <li class="hint">Total = 7 Facts</li>
+              </ul>
+            </div>
+            <p class="rodape">Agora: Passo 7.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Passo 7 — teoria · por que a Factory?</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge leitura">SÓ LEITURA — Passo 6c deu 3 verdes?</span>
+            <div class="explica"><strong>Unitário</strong> testa uma classe. <strong>Integração</strong> testa a API inteira — login, JWT e rotas — sem abrir o Chrome.</div>
+            <p class="passo-limpo"><strong>Em memória</strong> = a API sobe dentro do teste; você não precisa apertar F5.</p>
+            <div class="cards dois">
+              <div class="card azul">
+                <h3>WebApplicationFactory</h3>
+                <p>Usa o mesmo <code>Program</code></p>
+                <p>Troca o SQLite por arquivo temp</p>
+                <p>Cria <code>HttpClient</code> de teste</p>
+              </div>
+              <div class="card">
+                <h3>O que provamos</h3>
+                <p>POST login → token</p>
+                <p>Login errado → 401</p>
+                <p>GET sem Bearer → 401</p>
+                <p>GET com token → 200</p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> é o meio-termo — mais real que Moq, mais barato que abrir o browser.</div>
+          </div>
+          <aside class="lado">
+            <h3>Login demo</h3>
+            <p><code>ana@inss.gov.mz</code></p>
+            <p><code>1234</code></p>
+            <div class="callout red"><strong>Só comecem o Passo 7 se o 6c/6d deu 3 verdes.</strong></div>
+            <p class="rodape">Próximo: Passo 7a · AuthApiTests.cs.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 7a — criar AuthApiTests.cs</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR depois — primeiro criar arquivo vazio</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Gerenciador → projeto <strong>InssApi.Tests</strong> (mesmo lugar do Passo 3).</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Botão direito em <strong>InssApi.Tests</strong> → <strong>Adicionar</strong> → <strong>Classe…</strong></li>
+              <li>Nome: <code>AuthApiTests.cs</code> → Adicionar</li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> Gerenciador mostra 2 arquivos .cs (Contribuinte + Auth).</div>
+            <p class="passo-limpo">Conteúdo inteiro vem no <strong>Passo 7b</strong> — não digitem código aqui.</p>
+          </div>
+          <aside class="lado">
+            <div class="arvore">
+              <div class="bar">Gerenciador · InssApi.Tests</div>
+              <ul>
+                <li class="indent2 cs">ContribuinteServiceTests.cs</li>
+                <li class="indent2 cs novo foco">AuthApiTests.cs</li>
+              </ul>
+            </div>
+            <p class="rodape">Passo 7b = arquivo inteiro.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 7b — AuthApiTests.cs · copiar gabarito</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR AGORA — arquivo inteiro do gabarito</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Gabarito: <code>fiap_turma_2\dia4\manha\tests\AuthApiTests.cs</code> · Destino: seu <code>InssApi.Tests\AuthApiTests.cs</code>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Explorer ou VS Code → abrir gabarito <code>AuthApiTests.cs</code></li>
+              <li>Gabarito → <strong>Ctrl+A</strong> → <strong>Ctrl+C</strong></li>
+              <li>Visual Studio → seu <code>AuthApiTests.cs</code> → <strong>Ctrl+A</strong> → apagar → <strong>Ctrl+V</strong></li>
+              <li><strong>Compilar</strong> → barra: <em>Nenhum problema</em></li>
+            </ol>
+            <div class="callout green"><strong>Prova estrutura:</strong> Test Explorer lista <strong>7</strong> testes (3 + 4) — ainda não precisa rodar.</div>
+            <p class="passo-limpo">Slides <strong>7c–10</strong> = <span class="slide-badge pular" style="font-size:.85rem">PULAR</span> → vá direto ao <strong>Passo 11</strong> (executar os 7).</p>
+          </div>
+          <aside class="lado">
+            <div class="arvore">
+              <div class="bar">Gerenciador · depois do 7b</div>
+              <ul>
+                <li class="pasta foco">InssApi.Tests</li>
+                <li class="indent2 cs">ContribuinteServiceTests.cs <span class="hint">3 Facts</span></li>
+                <li class="indent2 cs foco">AuthApiTests.cs <span class="hint">4 Facts + Factory</span></li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: <strong>Passo 11</strong> (pule 7c–10).</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 7c — referência · InssApiFactory</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — copiou 7b inteiro? → Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">InssApiFactory — ConfigureWebHost</div>
+              <div class="tela-body denso"><span class="k">public</span> <span class="k">class</span> <span class="t">InssApiFactory</span> : <span class="t">WebApplicationFactory</span>&lt;<span class="t">Program</span>&gt;
+{
+  <span class="k">private</span> <span class="k">readonly</span> <span class="k">string</span> _dbPath = Path.<span class="m">Combine</span>(
+    Path.<span class="m">GetTempPath</span>(), $<span class="s">"inss-test-{Guid.NewGuid():N}.db"</span>);
+
+  <span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="m">ConfigureWebHost</span>(<span class="t">IWebHostBuilder</span> builder)
+  {
+    builder.<span class="m">UseEnvironment</span>(<span class="s">"Development"</span>);
+    builder.<span class="m">ConfigureServices</span>(services =&gt;
+    {
+      <span class="c">// remove DbContext de produção…</span>
+      services.<span class="m">AddDbContext</span>&lt;<span class="t">AppDbContext</span>&gt;(o =&gt;
+        o.<span class="m">UseSqlite</span>($<span class="s">"Data Source={_dbPath}"</span>));
+      <span class="c">// EnsureCreated()</span>
+    });
+  }
+}</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Ideia</h3>
+            <p>DB temporário por execução.</p>
+            <p>Não suja o <code>inss.db</code>.</p>
+            <p class="rodape">Gabarito tem o código completo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 7d — referência · Dispose</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">InssApiFactory — Dispose</div>
+              <div class="tela-body denso"><span class="k">protected</span> <span class="k">override</span> <span class="k">void</span> <span class="m">Dispose</span>(<span class="k">bool</span> disposing)
+{
+  <span class="k">base</span>.<span class="m">Dispose</span>(disposing);
+  <span class="k">try</span> {
+    <span class="k">if</span> (File.<span class="m">Exists</span>(_dbPath)) File.<span class="m">Delete</span>(_dbPath);
+  } <span class="k">catch</span> { <span class="c">/* ignore */</span> }
+}</div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> cada teste cria um arquivo <code>.db</code> temporário. No fim, o <code>Dispose</code> apaga — a máquina fica limpa e o <code>inss.db</code> da aula não é tocado.</div>
+          </div>
+          <aside class="lado">
+            <h3>Guid no nome</h3>
+            <p>Evita colisão se dois testes rodarem juntos.</p>
+            <p class="rodape"><code>inss-test-{guid}.db</code></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 7e — referência · remove DbContext</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <p class="passo-limpo">A Factory remove os registros de <code>DbContextOptions</code> e <code>AppDbContext</code> antes de registrar o SQLite de teste.</p>
+            <div class="explica">Se não remover, o teste pode continuar apontando para o <code>inss.db</code> real — ou falhar com “serviço já registrado”.</div>
+            <div class="callout green"><strong>Por quê:</strong> o teste precisa de um banco descartável. Produção e teste não compartilham o mesmo arquivo.</div>
+          </div>
+          <aside class="lado">
+            <h3>Depois</h3>
+            <p><code>AddDbContext</code> com path temp</p>
+            <p><code>EnsureCreated()</code></p>
+            <p class="rodape">Código completo no gabarito.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 8 — referência · fixture</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">AuthApiTests — IClassFixture</div>
+              <div class="tela-body denso"><span class="k">public</span> <span class="k">class</span> <span class="t">AuthApiTests</span> : <span class="t">IClassFixture</span>&lt;<span class="t">InssApiFactory</span>&gt;
+{
+  <span class="k">private</span> <span class="k">readonly</span> <span class="t">HttpClient</span> _client;
+
+  <span class="k">public</span> <span class="m">AuthApiTests</span>(<span class="t">InssApiFactory</span> factory)
+    =&gt; _client = factory.<span class="m">CreateClient</span>();
+}</div>
+            </div>
+            <div class="explica"><code>IClassFixture</code> = uma Factory compartilhada pela classe. Os 4 Facts usam o mesmo cliente HTTP.</div>
+          </div>
+          <aside class="lado">
+            <h3>CreateClient</h3>
+            <p>HTTP real contra a API em memória.</p>
+            <p class="rodape">Não precisa F5 aqui.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 8b — referência · Login válido</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">Fact — Login_Valido_DeveRetornarToken</div>
+              <div class="tela-body denso">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Login_Valido_DeveRetornarToken</span>()
+{
+  <span class="k">var</span> r = <span class="k">await</span> _client.<span class="m">PostAsJsonAsync</span>(<span class="s">"/api/auth/login"</span>, <span class="k">new</span> {
+    email = <span class="s">"ana@inss.gov.mz"</span>,
+    senha = <span class="s">"1234"</span>
+  });
+
+  Assert.<span class="m">Equal</span>(HttpStatusCode.OK, r.StatusCode);
+  <span class="k">var</span> json = <span class="k">await</span> r.Content.<span class="m">ReadFromJsonAsync</span>&lt;JsonElement&gt;();
+  Assert.<span class="m">True</span>(json.<span class="m">TryGetProperty</span>(<span class="s">"token"</span>, <span class="k">out</span> <span class="k">var</span> token));
+  Assert.<span class="m">False</span>(<span class="k">string</span>.<span class="m">IsNullOrWhiteSpace</span>(token.<span class="m">GetString</span>()));
+}</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>200 + token</h3>
+            <p>Mesmo login do portal.</p>
+            <p class="rodape">Prova o AuthController.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 9 — referência · Login 401</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">Fact — Login_Invalido_DeveRetornar401</div>
+              <div class="tela-body denso">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Login_Invalido_DeveRetornar401</span>()
+{
+  <span class="k">var</span> r = <span class="k">await</span> _client.<span class="m">PostAsJsonAsync</span>(<span class="s">"/api/auth/login"</span>, <span class="k">new</span> {
+    email = <span class="s">"ana@inss.gov.mz"</span>,
+    senha = <span class="s">"errada"</span>
+  });
+
+  Assert.<span class="m">Equal</span>(HttpStatusCode.Unauthorized, r.StatusCode);
+}</div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> senha errada não pode devolver token. 401 = “não autorizado”.</div>
+          </div>
+          <aside class="lado">
+            <h3>Senha</h3>
+            <p><code>errada</code> ≠ <code>1234</code></p>
+            <p class="rodape">Espelha o e2e inválido.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 9b — referência · Listar sem token</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">Fact — Listar_SemToken_DeveRetornar401</div>
+              <div class="tela-body denso">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Listar_SemToken_DeveRetornar401</span>()
+{
+  <span class="k">var</span> r = <span class="k">await</span> _client.<span class="m">GetAsync</span>(<span class="s">"/api/contribuintes"</span>);
+  Assert.<span class="m">Equal</span>(HttpStatusCode.Unauthorized, r.StatusCode);
+}</div>
+            </div>
+            <div class="explica">Sem header Authorization → o <code>[Authorize]</code> do Dia 3 bloqueia. Teste curto, regra forte.</div>
+          </div>
+          <aside class="lado">
+            <h3>Lembrete</h3>
+            <p>Dia 3: lista protegida.</p>
+            <p>Hoje: prova automática.</p>
+            <p class="rodape">Sem Bearer = 401.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 10 — referência · Listar com token</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <span class="slide-badge pular">PULAR — referência · Passo 11</span>
+            <div class="vs-path">
+              <span class="chip">Visual Studio</span><span class="sep">·</span>
+              <span class="chip accent">InssApi.Tests\AuthApiTests.cs</span>
+            </div>
+            <div class="tela">
+              <div class="tela-bar">Fact — Listar_ComToken_DeveRetornar200</div>
+              <div class="tela-body denso">[<span class="at">Fact</span>]
+<span class="k">public</span> <span class="k">async</span> Task <span class="m">Listar_ComToken_DeveRetornar200</span>()
+{
+  <span class="k">var</span> login = <span class="k">await</span> _client.<span class="m">PostAsJsonAsync</span>(<span class="s">"/api/auth/login"</span>, <span class="k">new</span> {
+    email = <span class="s">"ana@inss.gov.mz"</span>, senha = <span class="s">"1234"</span>
+  });
+  <span class="k">var</span> json = <span class="k">await</span> login.Content.<span class="m">ReadFromJsonAsync</span>&lt;JsonElement&gt;();
+  <span class="k">var</span> token = json.<span class="m">GetProperty</span>(<span class="s">"token"</span>).<span class="m">GetString</span>();
+
+  _client.DefaultRequestHeaders.Authorization =
+    <span class="k">new</span> AuthenticationHeaderValue(<span class="s">"Bearer"</span>, token);
+  <span class="k">var</span> r = <span class="k">await</span> _client.<span class="m">GetAsync</span>(<span class="s">"/api/contribuintes"</span>);
+
+  Assert.<span class="m">Equal</span>(HttpStatusCode.OK, r.StatusCode);
+}</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Fluxo</h3>
+            <p>1) Login</p>
+            <p>2) Pega token</p>
+            <p>3) GET com Bearer</p>
+            <p class="rodape">200 = autorizado.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 10b — prova · 7 Facts no Gerenciador</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge pular">PULAR se veio do 7b — só conferência</span>
+            <p class="onde"><span class="guia-tag prova">Prova</span> Explorador de Testes (sem rodar) — lista <strong>7</strong> testes?</p>
+            <div class="arvore testes">
+              <div class="bar">Explorador · lista (antes de executar)</div>
+              <ul>
+                <li class="pasta foco">InssApi.Tests (7)</li>
+                <li class="indent cs">ContribuinteServiceTests (3)</li>
+                <li class="indent cs foco">AuthApiTests (4)</li>
+              </ul>
+            </div>
+            <div class="callout green">OK → <strong>Passo 11</strong> (executar os 7).</div>
+          </div>
+          <aside class="lado">
+            <h3>3 + 4 = 7</h3>
+            <p>Moq + HTTP</p>
+            <p class="rodape">Executar → 11.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 11 — executar · 7 testes</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge executar">EXECUTAR AGORA — igual Passo 6c · agora são 7</span>
+            <p class="onde"><span class="guia-tag">Onde</span> Visual Studio → <strong>Teste</strong> → <strong>Explorador de Testes</strong>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li><strong>Compilar</strong> → Compilar Solução</li>
+              <li>Explorador de Testes → <strong>Executar todos os testes na solução</strong> (▶▶)</li>
+              <li>Aguardar · expandir até ver 7 nomes</li>
+            </ol>
+            <div class="arvore testes">
+              <div class="bar">Explorador · PROVA (7 verdes)</div>
+              <ul>
+                <li class="pasta foco">InssApi.Tests (7)</li>
+                <li class="indent cs">ContribuinteServiceTests (3) ✓</li>
+                <li class="indent cs foco">AuthApiTests (4) ✓</li>
+                <li class="hint">Aprovado: 7 · Com falha: 0</li>
+              </ul>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> 7 verdes → <strong>Passo 12</strong> (VS Code · Playwright).</div>
+          </div>
+          <aside class="lado">
+            <h3>Ou terminal</h3>
+            <pre class="term vs" style="font-size:.85rem;padding:.4rem .6rem">cd C:\fiap_turma_2
+dotnet test InssApi.Tests
+
+Aprovado: 7 · Com falha: 0</pre>
+            <p class="rodape">Vermelho → 11b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 11b — se ficou vermelho</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table>
+              <tr><th>Sintoma</th><th>Olhem primeiro</th></tr>
+              <tr><td>Não compila <code>Program</code></td><td>Falta <code>public partial class Program { }</code></td></tr>
+              <tr><td>Moq / package</td><td>Pacotes Moq e Mvc.Testing instalados?</td></tr>
+              <tr><td>Assert “9 dígitos”</td><td>Mensagem do Service mudou?</td></tr>
+              <tr><td>Login 401 no válido</td><td>Seed da Ana / senha <code>1234</code></td></tr>
+              <tr><td>DB locked</td><td>Fechem processos; Guid no path ajuda</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>Regra</h3>
+            <p>Leiam o Assert</p>
+            <p>Comparem com gabarito</p>
+            <p class="rodape"><code>fiap_turma_2\dia4\</code> (gabarito)</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide fill divisor-pratica">
+      <h1>Façam agora — VS Code</h1>
+      <p class="highlight">Passos 12 a 16 · pasta <code>inss-portal</code></p>
+      <div class="fluxo">
+        <div class="passo">1. Slide<small>caixa preta</small></div>
+        <div class="seta">→</div>
+        <div class="passo">2. Copiar<small><strong>Ctrl+C</strong></small></div>
+        <div class="seta">→</div>
+        <div class="passo">3. VS Code<small>arquivo · Ctrl+V</small></div>
+      </div>
+      <p class="instr-cola"><strong>Copiem do slide</strong> para o VS Code.</p>
+      <p class="aviso-cola">Antes: <code>dotnet test</code> = 7 verdes · API no F5 (5088).</p>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 12 — Playwright na prática</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>Playwright</strong> = teste da tela. Moq e Factory já provaram código e API — agora vemos se o portal <strong>funciona para a Ana</strong>.</div>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Por que só 2 testes?</h3>
+                <p>Browser é lento e frágil</p>
+                <p>Resto já está no .NET</p>
+              </div>
+              <div class="card code">
+                <h3>Antes de instalar</h3>
+                <p><code>dotnet test</code> = 7 verdes</p>
+                <p>Visual Studio → F5 (5088)</p>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Playwright</h3>
+            <p>Chip verde = VS Code</p>
+            <p><code>inss-portal</code></p>
+            <p class="rodape">Próximo: instalar.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Passo 13 — VS Code · instalar Playwright</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge copiar">COPIAR/COLAR comandos — terminal inss-portal</span>
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → pasta <code>inss-portal</code> · terminal em <code>inss-portal</code> (não a raiz).</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Prompt <code>...\inss-portal&gt;</code> · um comando por Enter:</p>
+            <ol>
+              <li><code>npm install</code></li>
+              <li><code>npm install -D @playwright/test</code></li>
+              <li><code>npx playwright install chromium</code></li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> pasta <code>node_modules</code> · comando <code>npx playwright --version</code> responde.</div>
+          </div>
+          <aside class="lado">
+            <h3>Antes</h3>
+            <p><code>dotnet test</code> = 7 verdes</p>
+            <p>F5 API <strong>5088</strong></p>
+            <p class="rodape">Próximo: 13b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 13b — VS Code · playwright.config.js</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code Explorador → raiz <code>inss-portal</code> (mesmo nível de <code>package.json</code>).</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Novo <code>playwright.config.js</code> → copiar <strong>arquivo inteiro</strong> do slide:</p>
+            <div class="tela code">
+              <div class="tela-bar">playwright.config.js</div>
+              <div class="tela-body denso mini"><span class="at">import</span> { defineConfig } <span class="at">from</span> <span class="s">"@playwright/test"</span>;
+
+<span class="at">export</span> <span class="k">default</span> <span class="m">defineConfig</span>({
+  testDir: <span class="s">"./e2e"</span>,
+  timeout: <span class="n">30_000</span>,
+  use: { baseURL: <span class="s">"http://localhost:5173"</span>, headless: <span class="k">true</span> },
+  webServer: {
+    command: <span class="s">"npm run dev"</span>,
+    url: <span class="s">"http://localhost:5173"</span>,
+    reuseExistingServer: <span class="k">true</span>,
+  },
+});</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Copiar</h3>
+            <p>Caixa preta → Ctrl+C</p>
+            <p>Editor → Ctrl+V</p>
+            <h3>webServer</h3>
+            <p>Sobe só o Vite.</p>
+            <p>API = F5 no VS.</p>
+            <p class="rodape">reuseExistingServer = true</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 13c — script npm run test:e2e</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → <code>inss-portal/package.json</code> → bloco <code>"scripts"</code>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span> Copiar linha <code>test:e2e</code> do slide (não apague dev/build):</p>
+            <div class="tela code">
+              <div class="tela-bar">package.json — scripts</div>
+              <div class="tela-body denso mini"><span class="s">"scripts"</span>: {
+  <span class="s">"dev"</span>: <span class="s">"vite"</span>,
+  <span class="s">"build"</span>: <span class="s">"vite build"</span>,
+  <span class="s">"test:e2e"</span>: <span class="s">"playwright test"</span>
+}</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Copiar</h3>
+            <p>Depois de <code>"build"</code></p>
+            <p>Não apague dev/build</p>
+            <p>Roda: <code>npm run test:e2e</code></p>
+            <p class="rodape">Próximo: Passo 13d.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 13d — prova · estrutura do portal</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → Explorador → pasta <code>inss-portal</code> (barra verde).</p>
+            <p class="onde"><span class="guia-tag prova">Prova</span> Comparem com a árvore — ainda <strong>sem</strong> <code>e2e\</code> (vem no Passo 14).</p>
+            <div class="arvore-dupla">
+              <div class="arvore vscode">
+                <div class="bar">VS Code · inss-portal</div>
+                <ul>
+                  <li class="pasta">src/</li>
+                  <li class="cs foco">package.json <span class="hint">← test:e2e</span></li>
+                  <li class="cs novo foco">playwright.config.js</li>
+                  <li class="pasta">node_modules/</li>
+                </ul>
+              </div>
+              <div class="arvore vscode">
+                <div class="bar">Terminal · inss-portal</div>
+                <ul>
+                  <li class="hint">prompt: ...\inss-portal&gt;</li>
+                  <li class="cs foco">npx playwright --version</li>
+                  <li class="hint">≠ fiap_turma_2&gt;</li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> <code>playwright.config.js</code> na raiz do portal · script <code>test:e2e</code> no package.json.</div>
+          </div>
+          <aside class="lado">
+            <h3>3 checks</h3>
+            <p>① VS Code = inss-portal</p>
+            <p>② config + script</p>
+            <p>③ terminal certo</p>
+            <p class="rodape">OK → Passo 14</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 14 — e2e · login inválido</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → <code>inss-portal</code> → nova pasta <code>e2e</code> → arquivo <code>portal.spec.js</code>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Explorador → botão direito → <strong>Nova pasta</strong> → <code>e2e</code></li>
+              <li>Dentro de <code>e2e</code> → novo arquivo <code>portal.spec.js</code></li>
+              <li>Slide → caixa abaixo → Ctrl+C → Ctrl+V</li>
+            </ol>
+            <p class="passo-limpo">Linha 1 = <code>import { test, expect } from "@playwright/test";</code></p>
+            <div class="tela code">
+              <div class="tela-bar">portal.spec.js — login inválido</div>
+              <div class="tela-body denso mini"><span class="at">import</span> { test, expect } <span class="at">from</span> <span class="s">"@playwright/test"</span>;
+
+test(<span class="s">"login inválido mostra erro"</span>, <span class="k">async</span> ({ page }) =&gt; {
+  <span class="k">await</span> page.<span class="m">goto</span>(<span class="s">"/login"</span>);
+  <span class="k">await</span> page.<span class="m">getByLabel</span>(<span class="s">"E-mail"</span>).<span class="m">fill</span>(<span class="s">"ana@inss.gov.mz"</span>);
+  <span class="k">await</span> page.<span class="m">getByLabel</span>(<span class="s">"Senha"</span>).<span class="m">fill</span>(<span class="s">"errada"</span>);
+  <span class="k">await</span> page.<span class="m">getByRole</span>(<span class="s">"button"</span>, { name: <span class="s">"Entrar"</span> }).<span class="m">click</span>();
+  <span class="k">await</span> expect(page.<span class="m">getByRole</span>(<span class="s">"alert"</span>))
+    .<span class="m">toContainText</span>(/inválidos/i);
+});</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <div class="arvore vscode">
+              <div class="bar">VS Code · depois do 14</div>
+              <ul>
+                <li class="pasta">src/</li>
+                <li class="pasta novo foco">e2e/</li>
+                <li class="indent cs novo foco">portal.spec.js</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: 14b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 14b — e2e · login válido</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <p class="passo-limpo">Mesmo arquivo · cursor no final → copiar 2º teste do slide:</p>
+            <div class="tela code">
+              <div class="tela-bar">portal.spec.js — login válido</div>
+              <div class="tela-body denso mini">test(<span class="s">"login válido abre a lista"</span>, <span class="k">async</span> ({ page }) =&gt; {
+  <span class="k">await</span> page.<span class="m">goto</span>(<span class="s">"/login"</span>);
+  <span class="k">await</span> page.<span class="m">getByLabel</span>(<span class="s">"E-mail"</span>).<span class="m">fill</span>(<span class="s">"ana@inss.gov.mz"</span>);
+  <span class="k">await</span> page.<span class="m">getByLabel</span>(<span class="s">"Senha"</span>).<span class="m">fill</span>(<span class="s">"1234"</span>);
+  <span class="k">await</span> page.<span class="m">getByRole</span>(<span class="s">"button"</span>, { name: <span class="s">"Entrar"</span> }).<span class="m">click</span>();
+  <span class="k">await</span> expect(page).<span class="m">toHaveURL</span>(<span class="s">"/"</span>);
+  <span class="k">await</span> expect(page.<span class="m">getByRole</span>(<span class="s">"heading"</span>, { name: <span class="s">"Portal INSS"</span> }))
+    .<span class="m">toBeVisible</span>();
+});</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Sucesso</h3>
+            <p>URL vira <code>/</code></p>
+            <p>Vê o título</p>
+            <p class="rodape">Atendente entrou.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 15 — labels e role=alert</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="cards dois">
+              <div class="card code">
+                <h3>getByLabel</h3>
+                <p>Procura o campo pelo texto do label.</p>
+                <p>“E-mail” e “Senha” — iguais à tela do Dia 3.</p>
+              </div>
+              <div class="card">
+                <h3>getByRole("alert")</h3>
+                <p>Mensagem de erro acessível.</p>
+                <p>O portal precisa marcar o erro como alert.</p>
+              </div>
+            </div>
+            <div class="browser">
+              <div class="barra"><span class="bolas">● ● ●</span><span class="url">http://localhost:5173/login</span></div>
+              <div class="pagina">
+                <h4>Entrar</h4>
+                <p>E-mail: ana@inss.gov.mz</p>
+                <p>Senha: ••••</p>
+                <p class="aviso" role="alert">Credenciais inválidos…</p>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Dica</h3>
+            <p>Não usem CSS frágil.</p>
+            <p>Role + label = estável.</p>
+            <p class="rodape">Igual acessibilidade.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 16 — executar · e2e (2 testes)</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <span class="slide-badge executar">EXECUTAR AGORA — F5 + npm run test:e2e</span>
+            <p class="onde"><span class="guia-tag">Onde</span> VS (API) + VS Code (<code>inss-portal</code>).</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>VS → projeto <strong>InssApi</strong> → <strong>F5</strong> · Swagger <code>5088</code> aberto</li>
+              <li>VS Code → terminal <code>inss-portal&gt;</code> → <code>npm run test:e2e</code></li>
+              <li>Prova: última linha = <strong>2 passed</strong></li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> <code>2 passed</code> · API no F5 · <code>e2e/portal.spec.js</code> no Explorador.</div>
+          </div>
+          <aside class="lado">
+            <h3>Terminal · inss-portal</h3>
+            <pre class="term vs" style="font-size:.9rem;padding:.45rem .6rem">npm run test:e2e
+
+  2 passed (15s)</pre>
+            <div class="arvore">
+              <div class="bar">VS · F5 → 5088</div>
+              <ul><li class="cs foco">2 passed</li></ul>
+            </div>
+            <p class="rodape">Manhã fechada.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Passo 16b — e2e · se ficou vermelho</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table>
+              <tr><th>Sintoma</th><th>Checagem</th></tr>
+              <tr><td>Connection refused</td><td>API no F5? Porta 5088?</td></tr>
+              <tr><td>Timeout no login</td><td>Vite 5173 no ar? CORS?</td></tr>
+              <tr><td>alert não achado</td><td>role=alert no erro do LoginPage?</td></tr>
+              <tr><td>URL não muda</td><td>Senha 1234? Token salvo?</td></tr>
+              <tr><td>Chromium missing</td><td><code>npx playwright install chromium</code></td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>Dica</h3>
+            <p>API desligada?</p>
+            <p>Label ≠ texto da tela?</p>
+            <p class="rodape"><code>inss-portal\e2e\</code></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Prova — os 7 testes + e2e</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="fluxo">
+              <div class="passo">dotnet test<small>7 passed</small></div>
+              <div class="seta">+</div>
+              <div class="passo">test:e2e<small>2 passed</small></div>
+              <div class="seta">=</div>
+              <div class="passo">Manhã ok</div>
+            </div>
+            <div class="arvore-dupla">
+              <div class="arvore">
+                <div class="bar">VS · fiap_turma_2</div>
+                <ul>
+                  <li class="pasta foco">InssApi.Tests</li>
+                  <li class="indent2 cs">ContribuinteServiceTests (3)</li>
+                  <li class="indent2 cs">AuthApiTests (4)</li>
+                </ul>
+              </div>
+              <div class="arvore vscode">
+                <div class="bar">VS Code · inss-portal</div>
+                <ul>
+                  <li class="pasta foco">e2e/portal.spec.js</li>
+                  <li class="cs">playwright.config.js</li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> M16 só é confiável se M15 já está verde na sua máquina.</div>
+          </div>
+          <aside class="lado">
+            <h3>Pausa</h3>
+            <p>7 + 2 verdes</p>
+            <p>2 ferramentas OK</p>
+            <p class="rodape">Depois: pipeline.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Checklist M15</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <ol>
+              <li>Raiz: <code>InssApi\</code> + <code>InssApi.Tests\</code> + <code>inss-portal\</code></li>
+              <li>VS: Solução <strong>2 de 2</strong> · partial no <code>Program.cs</code></li>
+              <li><code>InssApi.Tests</code> referencia <code>InssApi</code> · NuGet Moq + Mvc.Testing + Sqlite</li>
+              <li>2 arquivos: ContribuinteServiceTests (3) + AuthApiTests (4)</li>
+              <li><code>dotnet test</code> → <strong>7 verdes</strong></li>
+              <li>VS Code: <code>e2e/portal.spec.js</code> + <code>playwright.config.js</code></li>
+              <li>F5 (5088) + <code>npm run test:e2e</code> → <strong>2 verdes</strong></li>
+            </ol>
+          </div>
+          <aside class="lado">
+            <h3>Gabarito manhã</h3>
+            <p><code>fiap_turma_2\dia4\manha\</code></p>
+            <p class="rodape">Comparem estrutura.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide fill">
+      <p class="tag gold">Tarde</p>
+      <h1>M16 — Pipeline</h1>
+      <p class="highlight">GitHub Actions · portão de qualidade · arquivos para baixar</p>
+      <p>Manhã pronta (7 + 2 verdes)? Tarde Passos 1–15.</p>
+    </section>
+
+    <section class="slide compact">
+      <h2>O que é CI</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>CI</strong> (<em>Integração Contínua</em>) = toda vez que você envia código ao GitHub, uma máquina na nuvem roda os testes de novo.</div>
+            <p class="passo-limpo">Não confia no “funcionou no meu PC” — prova num computador limpo.</p>
+            <div class="fluxo">
+              <div class="passo">push</div>
+              <div class="seta">→</div>
+              <div class="passo">Actions</div>
+              <div class="seta">→</div>
+              <div class="passo">dotnet test</div>
+              <div class="seta">→</div>
+              <div class="passo">npm build</div>
+            </div>
+            <p class="passo-limpo"><strong>Quality gate</strong> (<code>needs</code>) = portão: o front só compila se os testes .NET passaram.</p>
+          </div>
+          <aside class="lado">
+            <div class="arvore vscode">
+              <div class="bar">Raiz · alvo final</div>
+              <ul>
+                <li class="pasta novo foco">.github/workflows/ci.yml</li>
+                <li class="pasta">InssApi/</li>
+                <li class="pasta">InssApi.Tests/</li>
+                <li class="pasta">inss-portal/</li>
+              </ul>
+            </div>
+            <p class="rodape">Push → Actions roda.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Palavras da tarde</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table class="def">
+              <tr><th>Palavra</th><th>Em português simples</th></tr>
+              <tr><td>GitHub</td><td>Site que guarda seu código na nuvem</td></tr>
+              <tr><td>Repo</td><td>Pasta do projeto no GitHub</td></tr>
+              <tr><td>Commit</td><td>Foto do código naquele momento</td></tr>
+              <tr><td>Push</td><td>Enviar essa foto para o GitHub</td></tr>
+              <tr><td>Actions</td><td>Robô do GitHub que roda comandos por você</td></tr>
+              <tr><td>Workflow / Job</td><td>Receita / uma etapa da receita</td></tr>
+              <tr><td>Artefato</td><td>Arquivo para baixar depois (.trx, dist)</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>3 telas Git</h3>
+            <p>① PC · VS Code raiz</p>
+            <p>② GitHub · aba Code</p>
+            <p>③ GitHub · aba Actions</p>
+            <p class="rodape">Prova = árvore igual ao slide.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Git — onde olhar em cada passo</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Mesmo padrão da manhã: <strong>Onde · Faça · Prova</strong> — mas em <strong>3 lugares</strong>:</p>
+            <table>
+              <tr><th>Passos</th><th>Onde olhar</th><th>Prova (estrutura)</th></tr>
+              <tr><td>3</td><td>VS Code · raiz PC</td><td><code>.git</code> + <code>.gitignore</code> + 3 pastas</td></tr>
+              <tr><td>4</td><td>GitHub · Code</td><td>3 pastas · <strong>sem</strong> <code>.github</code></td></tr>
+              <tr><td>5b–5c</td><td>VS Code · raiz PC</td><td><code>.github/workflows/ci.yml</code></td></tr>
+              <tr><td>10–11</td><td>GitHub · Code + Actions</td><td><code>ci.yml</code> no site · jobs verdes</td></tr>
+            </table>
+            <div class="callout green">Terminal Git sempre na <strong>raiz</strong> <code>fiap_turma_2&gt;</code> — igual Passo 1 da manhã.</div>
+          </div>
+          <aside class="lado">
+            <div class="fluxo" style="flex-direction:column;gap:.3rem">
+              <div class="passo">PC<small>VS Code</small></div>
+              <div class="seta">↓ push</div>
+              <div class="passo">Code<small>github.com</small></div>
+              <div class="seta">↓ ci.yml</div>
+              <div class="passo">Actions<small>robô</small></div>
+            </div>
+            <p class="rodape">Próximo: mapa da tarde.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact slide-mapa">
+      <h2>Tarde — o que vocês vão vendo</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Mesma pasta <code>D:\fiap_turma_2</code> — agora no <strong>GitHub</strong> e no <strong>Actions</strong>.</p>
+            <div class="linha-tempo fit">
+              <div class="etapa">
+                <div class="num">3</div>
+                <div>
+                  <div class="tit">VS Code · raiz PC</div>
+                  <div class="oq"><code>.git</code> + <code>.gitignore</code> + 3 pastas</div>
+                  <div class="prova">Passo 3</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">4b</div>
+                <div>
+                  <div class="tit">GitHub · Code (1º push)</div>
+                  <div class="oq">3 pastas · sem <code>.github</code></div>
+                  <div class="prova">Passo 4b</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">5c</div>
+                <div>
+                  <div class="tit">VS Code · ci.yml local</div>
+                  <div class="oq"><code>.github/workflows/ci.yml</code> no PC</div>
+                  <div class="prova">Passo 5c</div>
+                </div>
+              </div>
+              <div class="etapa">
+                <div class="num">10b</div>
+                <div>
+                  <div class="tit">GitHub · Code + Actions</div>
+                  <div class="oq"><code>.github</code> no site · jobs verdes</div>
+                  <div class="prova">Passo 11</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Na sua pasta</h3>
+            <div class="arvore vscode">
+              <div class="bar">D:\fiap_turma_2</div>
+              <ul>
+                <li class="pasta">InssApi/</li>
+                <li class="pasta">InssApi.Tests/</li>
+                <li class="pasta">inss-portal/</li>
+                <li class="pasta novo foco">.github/</li>
+                <li class="indent cs novo foco">workflows/ci.yml</li>
+              </ul>
+            </div>
+            <p class="provavel">VS Code na raiz · não subpasta.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide fill divisor-pratica">
+      <h1>Façam agora — GitHub</h1>
+      <p class="highlight">Tarde Passos 1 a 15 · raiz <code>fiap_turma_2</code></p>
+      <p>Prova = <strong>árvore do slide</strong> no PC, no GitHub Code ou no Actions.</p>
+      <p class="instr-cola">Passo 1: login · Passo 4: 1º push · Passo 5b: <code>ci.yml</code> · Passo 10: 2º push.</p>
+    </section>
+
+    <section class="slide compact teoria">
+      <h2>Tarde Passo 1 — conta no GitHub</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> Navegador → <code>github.com</code> (não é VS nem VS Code).</p>
+            <div class="explica"><strong>GitHub</strong> = Google Drive do código — guarda na nuvem e roda testes quando você envia alterações.</div>
+            <p class="onde"><span class="guia-tag">Faça</span> Escolham um caminho:</p>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Sem conta</h3>
+                <p><code>github.com/signup</code></p>
+                <p>E-mail · senha · usuário</p>
+                <p>Confirmar e-mail (se pedir)</p>
+              </div>
+              <div class="card azul">
+                <h3>Já tem conta</h3>
+                <p><code>github.com/login</code></p>
+                <p>Entrar · não criar outra</p>
+                <p>Esqueceu senha → recuperar no site</p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Prova:</strong> tela inicial do GitHub · avatar no canto · usuário anotado (ex.: <code>SEU_USUARIO</code>).</div>
+          </div>
+          <aside class="lado">
+            <div class="browser">
+              <div class="barra"><span class="bolas">● ● ●</span><span class="url">github.com</span></div>
+              <div class="pagina">
+                <p>Dashboard · New · avatar ✓</p>
+                <p class="aviso">Anotem o usuário</p>
+              </div>
+            </div>
+            <p class="rodape">Próximo: Passo 2.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 2 — repositório vazio</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> GitHub logado → botão verde <strong>New</strong> (ou + → New repository).</p>
+            <div class="explica"><strong>Repositório</strong> = pasta vazia na nuvem. O código vem do PC no Passo 4.</div>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol>
+              <li>Nome: <code>inss-portal-ci</code></li>
+              <li>Public ou Private</li>
+              <li><strong>Desmarquem</strong> README, .gitignore e license</li>
+              <li><strong>Create repository</strong></li>
+              <li>Copiar URL HTTPS → <code>https://github.com/SEU_USUARIO/inss-portal-ci.git</code></li>
+            </ol>
+            <div class="callout green"><strong>Prova:</strong> página “Quick setup” · repo <strong>vazio</strong> · sem pastas · URL anotada.</div>
+          </div>
+          <aside class="lado">
+            <div class="arvore vscode">
+              <div class="bar">GitHub · Code (vazio)</div>
+              <ul>
+                <li class="hint">…/inss-portal-ci</li>
+                <li class="hint">“Quick setup”</li>
+                <li class="hint">sem InssApi ainda</li>
+              </ul>
+            </div>
+            <p class="rodape">Próximo: Passo 3.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 3 — git init e .gitignore</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="explica"><strong>git init</strong> = liga sua pasta ao Git (histórico de versões). <strong>.gitignore</strong> = lista do que <strong>não</strong> sobe (banco, node_modules).</div>
+            <div class="vs-path">
+              <span class="chip code">VS Code</span><span class="sep">·</span>
+              <span class="chip accent">raiz fiap_turma_2</span>
+            </div>
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → <strong>Abrir pasta</strong> → raiz <code>fiap_turma_2</code> (não só inss-portal).</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol>
+              <li>Explorador mostra as 3 pastas abaixo</li>
+              <li>Terminal raiz: <code>git init</code></li>
+              <li>Criar <code>.gitignore</code> na raiz:</li>
+            </ol>
+            <div class="arvore vscode">
+              <div class="bar">VS Code · raiz · depois do Passo 3</div>
+              <ul>
+                <li class="pasta foco">InssApi/</li>
+                <li class="pasta foco">InssApi.Tests/</li>
+                <li class="pasta foco">inss-portal/</li>
+                <li class="cs novo foco">.gitignore</li>
+                <li class="pasta novo foco">.git/ <span class="hint">← oculta</span></li>
+              </ul>
+            </div>
+            <pre class="term vs">node_modules/
+bin/
+obj/
+*.db
+dist/
+.vs/</pre>
+            <div class="callout green"><strong>Prova:</strong> prompt <code>fiap_turma_2&gt;</code> · 3 pastas + <code>.gitignore</code> · pasta <code>.git</code> no Explorer (mostrar ocultos).</div>
+            <div class="callout red"><strong>Erro:</strong> <code>git init</code> dentro de <code>InssApi\</code> — tem que ser na <strong>raiz</strong>.</div>
+          </div>
+          <aside class="lado">
+            <h3>PC · ainda local</h3>
+            <p>GitHub ainda vazio</p>
+            <p>Manhã: VS Code = portal</p>
+            <p>Tarde: VS Code = raiz</p>
+            <p class="rodape">Próximo: Passo 4.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 4 — commit e push</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → terminal na <strong>raiz</strong> <code>fiap_turma_2</code>.</p>
+            <div class="explica"><strong>Commit</strong> = foto local · <strong>Push</strong> = enviar ao GitHub. Façam <strong>antes</strong> do <code>ci.yml</code>.</div>
+            <p class="onde"><span class="guia-tag">Faça</span> Um comando · Enter · próximo:</p>
+            <div class="term-bar">TERMINAL — raiz fiap_turma_2</div>
+            <ol>
+              <li><code>git add .</code></li>
+              <li><code>git commit -m "feat: API, testes M15 e portal"</code></li>
+              <li><code>git branch -M main</code></li>
+              <li><code>git remote add origin https://github.com/SEU_USUARIO/inss-portal-ci.git</code></li>
+              <li><code>git push -u origin main</code></li>
+            </ol>
+            <div class="callout red"><strong>Erro:</strong> URL do Passo 2 errada · ou repo criado <strong>com</strong> README (conflito no push).</div>
+          </div>
+          <aside class="lado">
+            <p class="rodape">Prova → Passo 4b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 4b — prova · 1º push no GitHub</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag prova">Prova</span> GitHub → repo <code>inss-portal-ci</code> → aba <strong>Code</strong> — comparem com as árvores.</p>
+            <div class="arvore-dupla">
+              <div class="arvore vscode">
+                <div class="bar">VS Code · PC (local)</div>
+                <ul>
+                  <li class="pasta foco">InssApi/</li>
+                  <li class="pasta foco">InssApi.Tests/</li>
+                  <li class="pasta foco">inss-portal/</li>
+                  <li class="cs">.gitignore</li>
+                  <li class="pasta">.git/</li>
+                  <li class="hint">sem .github ainda</li>
+                </ul>
+              </div>
+              <div class="arvore vscode">
+                <div class="bar">GitHub · Code (nuvem)</div>
+                <ul>
+                  <li class="pasta foco">InssApi/</li>
+                  <li class="pasta foco">InssApi.Tests/</li>
+                  <li class="pasta foco">inss-portal/</li>
+                  <li class="hint">sem .github</li>
+                  <li class="hint">sem aba Actions verde ainda</li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>OK se:</strong> 3 pastas iguais nos dois lados · branch <code>main</code> · ainda <strong>sem</strong> <code>.github/workflows</code>.</div>
+          </div>
+          <aside class="lado">
+            <h3>3 checks</h3>
+            <p>① 3 pastas no Code</p>
+            <p>② sem .github</p>
+            <p>③ push terminou sem erro</p>
+            <p class="rodape">OK → Passo 5</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 5 — onde entra o ci.yml</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → raiz <code>fiap_turma_2</code> — nova pasta <code>.github/workflows/</code>.</p>
+            <div class="explica"><strong>Workflow</strong> = receita do robô. Caminho fixo: <code>.github/workflows/ci.yml</code>.</div>
+            <div class="arvore vscode">
+              <div class="bar">VS Code · raiz · alvo do Passo 5b</div>
+              <ul>
+                <li class="pasta novo foco">.github/</li>
+                <li class="indent pasta">workflows/</li>
+                <li class="indent2 cs novo foco">ci.yml</li>
+                <li class="pasta">InssApi/</li>
+                <li class="pasta">InssApi.Tests/</li>
+                <li class="pasta">inss-portal/</li>
+              </ul>
+            </div>
+            <div class="callout green"><strong>Prova (depois do 5b):</strong> arquivo no PC · GitHub Code ainda <strong>sem</strong> <code>.github</code> até o Passo 10.</div>
+          </div>
+          <aside class="lado">
+            <h3>Nomes reais</h3>
+            <p><code>InssApi.Tests</code></p>
+            <p><code>inss-portal</code></p>
+            <p class="rodape">Próximo: Passo 5b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 5b — criar o ci.yml</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → criar pastas <code>.github\workflows\</code> na raiz.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol class="colar">
+              <li>Explorador → Nova pasta <code>.github</code> → dentro <code>workflows</code></li>
+              <li>Dentro de <code>workflows</code> → novo arquivo <code>ci.yml</code></li>
+              <li>Gabarito <code>fiap_turma_2\dia4\tarde\.github\workflows\ci.yml</code> → Ctrl+A → Ctrl+C</li>
+              <li>Seu <code>ci.yml</code> → Ctrl+V (arquivo inteiro)</li>
+            </ol>
+            <div class="callout red"><strong>Erro:</strong> <code>ci.yml</code> dentro de <code>InssApi\</code> — tem que ser na <strong>raiz</strong>, ao lado das 3 pastas.</div>
+          </div>
+          <aside class="lado">
+            <h3>Copiar inteiro</h3>
+            <p>Nome no Actions:</p>
+            <p><code>CI — InssApi + portal</code></p>
+            <p class="rodape">Próximo: Passo 5c.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 5c — prova · ci.yml no PC</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag prova">Prova</span> VS Code Explorador — comparem antes do 2º push (Passo 10).</p>
+            <div class="arvore-dupla">
+              <div class="arvore vscode">
+                <div class="bar">VS Code · PC (local)</div>
+                <ul>
+                  <li class="pasta novo foco">.github/workflows/</li>
+                  <li class="indent2 cs novo foco">ci.yml</li>
+                  <li class="pasta">InssApi/</li>
+                  <li class="pasta">InssApi.Tests/</li>
+                  <li class="pasta">inss-portal/</li>
+                </ul>
+              </div>
+              <div class="arvore vscode">
+                <div class="bar">GitHub · Code (ainda)</div>
+                <ul>
+                  <li class="pasta foco">InssApi/</li>
+                  <li class="pasta foco">InssApi.Tests/</li>
+                  <li class="pasta foco">inss-portal/</li>
+                  <li class="hint">sem .github ← normal</li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>OK se:</strong> <code>ci.yml</code> no PC · GitHub ainda sem <code>.github</code> · slides 6–9 = entender o YAML (referência).</div>
+          </div>
+          <aside class="lado">
+            <h3>3 checks</h3>
+            <p>① .github/workflows/</p>
+            <p>② ci.yml com conteúdo</p>
+            <p>③ GitHub sem .github</p>
+            <p class="rodape">OK → Passo 6 ou 10.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 6 — gatilho <code>on:</code></h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <div class="vs-path">
+              <span class="chip code">VS Code</span><span class="sep">·</span>
+              <span class="chip accent">ci.yml</span>
+            </div>
+            <div class="tela code">
+              <div class="tela-bar">ci.yml — on:</div>
+              <div class="tela-body denso"><span class="a">on</span>:
+  <span class="a">push</span>:
+    <span class="a">branches</span>: [main, master]
+  <span class="a">pull_request</span>:</div>
+            </div>
+            <div class="explica"><strong>on:</strong> = despertador do robô — roda a cada <strong>push</strong> (envio) ou <strong>pull request</strong> (pedido de revisão).</div>
+          </div>
+          <aside class="lado">
+            <h3>Gatilho</h3>
+            <p>Push → roda sozinho</p>
+            <p class="rodape">Sem botão manual.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 6b — runner ubuntu-latest</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="passo-limpo">Cada job tem <code>runs-on: ubuntu-latest</code> — uma máquina Linux limpa na nuvem.</p>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Parte do zero</h3>
+                <p>checkout do código</p>
+                <p>instala .NET / Node</p>
+                <p>roda os comandos</p>
+              </div>
+              <div class="card azul">
+                <h3>Não é o seu PC</h3>
+                <p>Sem F5 local</p>
+                <p>Sem pasta esquecida</p>
+                <p>Se passou aí, passou de verdade</p>
+              </div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> a nuvem não “lembra” do que você testou ontem. Cada push é uma prova nova.</div>
+          </div>
+          <aside class="lado">
+            <h3>dotnet-version</h3>
+            <p><code>10.0.x</code> no setup-dotnet</p>
+            <p class="rodape">Node 20 no front.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 7 — job test-api (YAML)</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <div class="explica"><strong>Job</strong> = uma etapa do pipeline. Este roda <code>dotnet test</code> num Linux novo — sem depender do seu PC.</div>
+            <div class="vs-path">
+              <span class="chip code">VS Code</span><span class="sep">·</span>
+              <span class="chip accent">ci.yml · job test-api</span>
+            </div>
+            <div class="tela code">
+              <div class="tela-bar">ci.yml — test-api</div>
+              <div class="tela-body denso"><span class="a">test-api</span>:
+  <span class="a">name</span>: Testes .NET (M15)
+  <span class="a">runs-on</span>: ubuntu-latest
+  <span class="a">defaults</span>:
+    <span class="a">run</span>:
+      <span class="mark"><span class="a">working-directory</span>: InssApi.Tests</span>
+  <span class="a">steps</span>:
+    - <span class="a">uses</span>: actions/checkout@v4
+    - <span class="a">uses</span>: actions/setup-dotnet@v4
+      <span class="a">with</span>:
+        <span class="a">dotnet-version</span>: <span class="s">"10.0.x"</span>
+    - <span class="a">name</span>: Restore + test
+      <span class="a">run</span>: |
+        dotnet restore
+        dotnet test --no-restore --logger <span class="s">"trx;LogFileName=results.trx"</span></div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>working-directory</h3>
+            <p>Comandos rodam em <code>InssApi.Tests/</code></p>
+            <p class="rodape">Os 7 Facts do M15.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 7b — upload dos resultados .trx</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <div class="vs-path">
+              <span class="chip code">VS Code</span><span class="sep">·</span>
+              <span class="chip accent">ci.yml · artefato test-results</span>
+            </div>
+            <div class="tela code">
+              <div class="tela-bar">ci.yml — Upload resultados</div>
+              <div class="tela-body denso">- <span class="a">name</span>: Upload resultados
+  <span class="a">if</span>: always()
+  <span class="a">uses</span>: actions/upload-artifact@v4
+  <span class="a">with</span>:
+    <span class="a">name</span>: test-results
+    <span class="a">path</span>: InssApi.Tests/TestResults/**/*.trx</div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> <code>if: always()</code> guarda o .trx mesmo se o teste falhou — dá para baixar e ler o Assert.</div>
+          </div>
+          <aside class="lado">
+            <h3>Artefato</h3>
+            <p>Nome: test-results</p>
+            <p class="rodape">Baixem no Actions.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 8 — job build-front + needs</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <div class="explica"><strong>Segundo job</strong> = compila o portal. <code>needs: test-api</code> = só começa se os testes .NET passaram (quality gate).</div>
+            <div class="vs-path">
+              <span class="chip code">VS Code</span><span class="sep">·</span>
+              <span class="chip accent">ci.yml · job build-front</span>
+            </div>
+            <div class="tela code">
+              <div class="tela-bar">ci.yml — build-front</div>
+              <div class="tela-body denso"><span class="a">build-front</span>:
+  <span class="a">name</span>: Build React (quality gate)
+  <span class="mark"><span class="a">needs</span>: test-api</span>
+  <span class="a">runs-on</span>: ubuntu-latest
+  <span class="a">defaults</span>:
+    <span class="a">run</span>:
+      <span class="a">working-directory</span>: inss-portal
+  <span class="a">steps</span>:
+    - <span class="a">uses</span>: actions/checkout@v4
+    - <span class="a">uses</span>: actions/setup-node@v4
+      <span class="a">with</span>:
+        <span class="a">node-version</span>: <span class="s">"20"</span>
+        <span class="a">cache</span>: npm
+        <span class="a">cache-dependency-path</span>: inss-portal/package-lock.json
+    - <span class="a">name</span>: Install + build
+      <span class="a">run</span>: |
+        npm ci
+        npm run build</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>needs</h3>
+            <p>Front só se API passou.</p>
+            <p class="rodape">Quality gate.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 8b — quality gate em uma frase</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="fluxo">
+              <div class="passo">test-api<small>7 testes</small></div>
+              <div class="seta">→</div>
+              <div class="passo">verde?</div>
+              <div class="seta">→</div>
+              <div class="passo">build-front<small>npm build</small></div>
+            </div>
+            <div class="callout green"><strong>Por quê:</strong> <code>needs: test-api</code> = o front só builda se os testes .NET passaram. É o portão de qualidade.</div>
+            <div class="callout red">Se o teste falhar → pipeline <strong>vermelho</strong> e para. Não “fingimos” que está ok.</div>
+          </div>
+          <aside class="lado">
+            <h3>Verde / vermelho</h3>
+            <p>Verde → pode seguir</p>
+            <p>Vermelho → corrija antes</p>
+            <p class="rodape">Leiam o log no Actions.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 9 — artefato portal-dist</h2>
+      <div class="content">
+        <div class="split codigo">
+          <div class="col">
+            <div class="vs-path">
+              <span class="chip code">VS Code</span><span class="sep">·</span>
+              <span class="chip accent">ci.yml · Upload dist</span>
+            </div>
+            <div class="tela code">
+              <div class="tela-bar">ci.yml — Upload dist</div>
+              <div class="tela-body denso">- <span class="a">name</span>: Upload dist
+  <span class="a">uses</span>: actions/upload-artifact@v4
+  <span class="a">with</span>:
+    <span class="a">name</span>: portal-dist
+    <span class="a">path</span>: inss-portal/dist</div>
+            </div>
+            <div class="explica">O <code>npm run build</code> gera a pasta <code>dist</code>. Guardamos como artefato — visão de empacotar sem publicar ainda.</div>
+          </div>
+          <aside class="lado">
+            <h3>Dois artefatos</h3>
+            <p>test-results (.trx)</p>
+            <p>portal-dist (dist)</p>
+            <p class="rodape">Baixem no fim do run.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 10 — git push do workflow</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS Code → terminal na <strong>raiz</strong> <code>fiap_turma_2</code>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span> 2º push — sobe só o <code>ci.yml</code> · dispara o Actions:</p>
+            <div class="term-bar">TERMINAL — raiz fiap_turma_2</div>
+            <ol>
+              <li><code>git add .github/workflows/ci.yml</code></li>
+              <li><code>git commit -m "ci: testes e build do portal"</code></li>
+              <li><code>git push</code></li>
+            </ol>
+            <div class="callout">Primeira vez: GitHub pede <strong>habilitar Actions</strong> → Settings → Allow → <code>git push</code> de novo.</div>
+            <p class="passo-limpo">Depois do push → GitHub → aba <strong>Actions</strong> → run amarelo (~1–2 min).</p>
+          </div>
+          <aside class="lado">
+            <p class="rodape">Prova → Passo 10b.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 10b — prova · Code + Actions</h2>
+      <div class="content center-y">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag prova">Prova</span> Duas abas no GitHub — estrutura igual ao slide:</p>
+            <div class="arvore-dupla">
+              <div class="arvore vscode">
+                <div class="bar">GitHub · aba Code</div>
+                <ul>
+                  <li class="pasta novo foco">.github/workflows/</li>
+                  <li class="indent2 cs novo foco">ci.yml</li>
+                  <li class="pasta">InssApi/</li>
+                  <li class="pasta">InssApi.Tests/</li>
+                  <li class="pasta">inss-portal/</li>
+                </ul>
+              </div>
+              <div class="arvore vscode">
+                <div class="bar">GitHub · aba Actions</div>
+                <ul>
+                  <li class="pasta foco">CI — InssApi + portal</li>
+                  <li class="indent hint">run · amarelo → verde</li>
+                  <li class="indent cs">test-api</li>
+                  <li class="indent cs">build-front</li>
+                </ul>
+              </div>
+            </div>
+            <div class="callout green"><strong>OK se:</strong> <code>ci.yml</code> visível no Code · Actions com workflow rodando.</div>
+          </div>
+          <aside class="lado">
+            <h3>3 checks</h3>
+            <p>① .github no Code</p>
+            <p>② aba Actions existe</p>
+            <p>③ run apareceu</p>
+            <p class="rodape">OK → Passo 11.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 11 — ler a UI do Actions</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> GitHub → repo <code>inss-portal-ci</code> → aba <strong>Actions</strong>.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol>
+              <li>Repo no GitHub → aba <strong>Actions</strong></li>
+              <li>Cliquem no workflow <strong>CI — InssApi + portal</strong></li>
+              <li>Abram o run mais recente</li>
+              <li>Job <code>Testes .NET (M15)</code> → log do <code>dotnet test</code></li>
+              <li>Job <code>Build React</code> só aparece se o 1º passou</li>
+              <li>Em Artifacts: baixem <code>test-results</code> e <code>portal-dist</code></li>
+            </ol>
+            <div class="explica">Bolinha verde = passou. Vermelha = abram o step que falhou e leiam o Assert.</div>
+            <div class="callout green"><strong>Prova:</strong> job <code>Testes .NET (M15)</code> verde · depois <code>Build React</code> verde · artefatos <code>test-results</code> + <code>portal-dist</code>.</div>
+          </div>
+          <aside class="lado">
+            <div class="arvore vscode">
+              <div class="bar">GitHub · Actions</div>
+              <ul>
+                <li class="pasta foco">CI — InssApi + portal</li>
+                <li class="indent cs foco">test-api ✓</li>
+                <li class="indent cs foco">build-front ✓</li>
+              </ul>
+            </div>
+            <p class="rodape">Corrijam → push de novo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 12 — quebrar um teste de propósito</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <p class="onde"><span class="guia-tag">Onde</span> VS → <code>InssApi.Tests\AuthApiTests.cs</code> · terminal Git na raiz.</p>
+            <p class="onde"><span class="guia-tag">Faça</span></p>
+            <ol>
+              <li>Mudar um Assert (ex.: login inválido espera 200 em vez de 401)</li>
+              <li><code>git add InssApi.Tests/AuthApiTests.cs</code></li>
+              <li><code>git commit -m "test: quebrar de proposito"</code></li>
+              <li><code>git push</code></li>
+              <li>GitHub Actions → run <strong>vermelho</strong></li>
+              <li>Reverter Assert · commit · push → verde de novo</li>
+            </ol>
+            <div class="fluxo">
+              <div class="passo">Assert errado</div>
+              <div class="seta">→</div>
+              <div class="passo">test-api ✗</div>
+              <div class="seta">→</div>
+              <div class="passo">build-front parado</div>
+            </div>
+            <div class="callout red">Não deixem o Assert quebrado no final da aula.</div>
+          </div>
+          <aside class="lado">
+            <div class="arvore vscode">
+              <div class="bar">Actions · vermelho</div>
+              <ul>
+                <li class="cs foco">test-api ✗</li>
+                <li class="hint">build-front skipped</li>
+              </ul>
+            </div>
+            <p class="rodape">Quality gate visível.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 13 — ambientes Dev / Staging / Prod</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="cards" style="grid-template-columns:1fr 1fr 1fr">
+              <div class="card">
+                <h3>Dev</h3>
+                <p>Máquina local</p>
+                <p>F5 + Vite</p>
+                <p>5088 / 5173</p>
+              </div>
+              <div class="card azul">
+                <h3>Staging</h3>
+                <p>Homologação</p>
+                <p>Ensaio com dados de teste</p>
+              </div>
+              <div class="card code">
+                <h3>Produção</h3>
+                <p>Usuários reais</p>
+                <p>Só com CI verde</p>
+              </div>
+            </div>
+            <div class="callout green">Deploy controlado = só sobe versão que passou no quality gate. Hoje <strong>não</strong> fazemos deploy — só o CI.</div>
+          </div>
+          <aside class="lado">
+            <h3>Escopo</h3>
+            <p>Entender o pipeline.</p>
+            <p>Ver verde/vermelho.</p>
+            <p class="rodape">Publicar = próximo passo.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 14 — visão de empacotar</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="fluxo">
+              <div class="passo">CI verde</div>
+              <div class="seta">→</div>
+              <div class="passo">artefato dist</div>
+              <div class="seta">→</div>
+              <div class="passo">publicar<small>futuro</small></div>
+            </div>
+            <div class="cards dois">
+              <div class="card">
+                <h3>Já temos</h3>
+                <p>Testes automatizados</p>
+                <p>Build do portal</p>
+                <p>Artefatos baixáveis</p>
+              </div>
+              <div class="card azul">
+                <h3>Ainda não</h3>
+                <p>Deploy automático</p>
+                <p>Secrets de produção</p>
+                <p>Slots Azure / IIS</p>
+              </div>
+            </div>
+            <div class="explica">O artefato <code>portal-dist</code> é o “pacote” do front. A API seguiria o mesmo raciocínio (publish).</div>
+          </div>
+          <aside class="lado">
+            <h3>Mensagem</h3>
+            <p>CI primeiro.</p>
+            <p>CD depois.</p>
+            <p class="rodape">Base sólida.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Tarde Passo 15 — troubleshooting do CI</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table>
+              <tr><th>Problema</th><th>O que checar</th></tr>
+              <tr><td>Actions não aparece</td><td>Arquivo em <code>.github/workflows/</code>? Actions habilitado?</td></tr>
+              <tr><td>dotnet test falha</td><td>Mesmo erro local? partial Program? pacotes?</td></tr>
+              <tr><td>npm ci falha</td><td><code>package-lock.json</code> em <code>inss-portal</code>? path do cache?</td></tr>
+              <tr><td>build-front skipped</td><td>Normal se test-api vermelho (needs)</td></tr>
+              <tr><td>working-directory</td><td><code>InssApi.Tests</code> e <code>inss-portal</code> na raiz?</td></tr>
+              <tr><td><code>git push</code> pede senha</td><td>Login pelo browser ou Personal Access Token (GitHub → Settings → Developer settings)</td></tr>
+              <tr><td>Repo vazio no site mas push falha</td><td>URL do <code>remote add</code> bate com o repo? Branch <code>main</code>?</td></tr>
+            </table>
+          </div>
+          <aside class="lado">
+            <h3>Ordem de checagem</h3>
+            <p>1) Estrutura PC</p>
+            <p>2) Estrutura Code</p>
+            <p>3) Log do Actions</p>
+            <p class="rodape">Gabarito: <code>fiap_turma_2\dia4\tarde</code></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Checklist M16</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <ol>
+              <li>GitHub: conta + repo vazio <code>inss-portal-ci</code></li>
+              <li>PC: <code>git init</code> na raiz · <code>.gitignore</code> · 3 pastas</li>
+              <li>1º push: Code com 3 pastas · <strong>sem</strong> <code>.github</code></li>
+              <li>PC: <code>.github/workflows/ci.yml</code> (gabarito tarde)</li>
+              <li>2º push: Code com <code>.github</code> · Actions verde</li>
+              <li>Jobs: <code>test-api</code> (7 testes) → <code>build-front</code> (needs)</li>
+              <li>Artefatos: <code>test-results</code> + <code>portal-dist</code></li>
+              <li>Exercício: Assert quebrado → vermelho → revertido → verde</li>
+            </ol>
+          </div>
+          <aside class="lado">
+            <div class="arvore-dupla" style="grid-template-columns:1fr">
+              <div class="arvore vscode">
+                <div class="bar">GitHub · Code (final)</div>
+                <ul>
+                  <li class="pasta foco">.github/workflows/ci.yml</li>
+                  <li class="pasta">InssApi/</li>
+                  <li class="pasta">InssApi.Tests/</li>
+                  <li class="pasta">inss-portal/</li>
+                </ul>
+              </div>
+            </div>
+            <p class="rodape"><code>fiap_turma_2\dia4\tarde\</code></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>O que ficou dos quatro dias</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table>
+              <tr><th>Dia</th><th>Módulo</th><th>Peça que ficou</th></tr>
+              <tr><td>1</td><td>M5 · M6</td><td>API + Swagger + <code>inss.db</code></td></tr>
+              <tr><td>2</td><td>M7 · M8</td><td>1:N · camadas · middleware</td></tr>
+              <tr><td>3</td><td>M13 · M14</td><td>Portal · CORS · JWT · sessão</td></tr>
+              <tr><td>4</td><td>M15 · M16</td><td>Testes · CI · quality gate</td></tr>
+            </table>
+            <div class="fluxo">
+              <div class="passo">Código<small>Dias 1–3</small></div>
+              <div class="seta">→</div>
+              <div class="passo">Prova<small>M15</small></div>
+              <div class="seta">→</div>
+              <div class="passo">Nuvem<small>M16</small></div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Linha do tempo</h3>
+            <p>Criar · persistir · organizar · mostrar · proteger · <strong>provar</strong> · <strong>automatizar</strong>.</p>
+            <p class="rodape">Uma API. Um portal. Um pipeline.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Resumo rápido M15 + M16</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <table>
+              <tr><th>Peça</th><th>Onde digitar</th><th>Prova</th></tr>
+              <tr><td>3 unitários Moq</td><td>VS · InssApi.Tests</td><td>ContribuinteServiceTests</td></tr>
+              <tr><td>4 Auth HTTP</td><td>VS · AuthApiTests.cs</td><td>token / 401 / Bearer</td></tr>
+              <tr><td>2 e2e</td><td>VS Code · inss-portal/e2e</td><td>alert + lista</td></tr>
+              <tr><td>ci.yml</td><td>VS Code · raiz .github</td><td>Code + Actions verdes</td></tr>
+              <tr><td>1º push</td><td>GitHub · Code</td><td>3 pastas · sem .github</td></tr>
+              <tr><td>2º push</td><td>GitHub · Actions</td><td>test-api → build-front</td></tr>
+            </table>
+            <div class="fluxo">
+              <div class="passo">7 .NET</div>
+              <div class="seta">+</div>
+              <div class="passo">2 e2e</div>
+              <div class="seta">+</div>
+              <div class="passo">CI verde</div>
+            </div>
+          </div>
+          <aside class="lado">
+            <h3>Gabaritos</h3>
+            <p>Alunos: <code>fiap_turma_2</code></p>
+            <p>Gabarito: <code>fiap_turma_2\dia4\</code></p>
+            <p class="rodape">Completos e alinhados.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide compact">
+      <h2>Levem para casa</h2>
+      <div class="content">
+        <div class="split">
+          <div class="col">
+            <div class="cards dois">
+              <div class="card">
+                <h3>Manhã</h3>
+                <p>AAA em todo Fact</p>
+                <p>Moq no Service</p>
+                <p>Factory no Auth</p>
+                <p>2 e2e no fluxo crítico</p>
+              </div>
+              <div class="card azul">
+                <h3>Tarde</h3>
+                <p><code>ci.yml</code> na raiz</p>
+                <p><code>needs</code> = quality gate</p>
+                <p>Artefatos .trx + dist</p>
+                <p>Vermelho ensina</p>
+              </div>
+            </div>
+            <div class="callout green">Mesmo InssApi + portal do Dia 3. Testes AAA. CI com quality gate no GitHub Actions.</div>
+          </div>
+          <aside class="lado">
+            <h3>Números</h3>
+            <p>7 testes .NET</p>
+            <p>2 e2e</p>
+            <p>2 jobs CI</p>
+            <p class="rodape">Portas 5088 / 5173</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide fill">
+      <h1>Fim do dia</h1>
+      <p class="highlight">M15 + M16</p>
+      <div class="callout green">Mesmo InssApi + portal do Dia 3. Testes AAA (xUnit/Moq/integração/e2e). CI com quality gate no GitHub Actions.</div>
+      <p>Profº Fernando Lopes Cardoso Ferreira</p>
+      <p>17 de setembro de 2026 · G2 · INSS Moçambique</p>
+    </section>
+
+  </div>
+
+  <div class="nav-bar">
+    <button type="button" id="prev" disabled>← Anterior</button>
+    <span class="slide-counter"><span id="cur">1</span> / <span id="total">1</span></span>
+    <button type="button" id="next">Próximo →</button>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const total = slides.length;
+    let i = 0;
+    document.getElementById('total').textContent = total;
+    function show(n) {
+      i = Math.max(0, Math.min(total - 1, n));
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+      document.getElementById('cur').textContent = i + 1;
+      document.getElementById('prev').disabled = i === 0;
+      document.getElementById('next').disabled = i === total - 1;
+      document.getElementById('progress').style.width = ((i + 1) / total * 100) + '%';
+    }
+    document.getElementById('prev').onclick = () => show(i - 1);
+    document.getElementById('next').onclick = () => show(i + 1);
+    document.addEventListener('keydown', (e) => {
+      if (e.target.matches('input, textarea')) return;
+      if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+      if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+      if (e.key === 'Home') show(0);
+      if (e.key === 'End') show(total - 1);
+    });
+    show(0);
+  </script>
+</body>
+</html>
