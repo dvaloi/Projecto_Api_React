@@ -1,0 +1,8 @@
+postgresql://neondb_owner:npg_eTW4xZpsNQK3@ep-lively-art-b49af44c-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+
+
+Host= ; Port=5432; Database= ; UserName= ; Possword= ;SSL Mode=require, Channel Binding=require
+
+postgresql://{usuario}:{Senha}@{Host}:{port}/{banco}?sslmode=require&channel_binding=require
+
+Host=ep-lively-art-b49af44c-pooler.c-6.us-east-2.aws.neon.tech; Port=5432; Database=neondb; UserName=neondb_owner; Password=npg_eTW4xZpsNQK3; SSL Mode=require; Channel Binding=require
